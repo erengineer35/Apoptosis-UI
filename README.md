@@ -1,6 +1,6 @@
 ---
 title: Cell Morphology Studio
-emoji: C
+emoji: 🔬
 colorFrom: green
 colorTo: blue
 sdk: gradio

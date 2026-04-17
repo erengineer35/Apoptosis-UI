@@ -1,0 +1,15 @@
+gradio
+torch
+torchvision
+segmentation-models-pytorch
+albumentations
+opencv-python-headless
+numpy
+scipy
+scikit-image
+matplotlib
+pillow
+reportlab
+transformers
+groq
+python-dotenv

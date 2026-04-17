@@ -1,0 +1,2143 @@
+<Window x:Class="ApoptosisUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Cell Morphology Studio"
+        Height="720"
+        Width="1180"
+        MinHeight="640"
+        MinWidth="1020"
+        WindowStartupLocation="CenterScreen"
+        Background="#F8F6F9"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <!-- New Color Palette -->
+        <SolidColorBrush x:Key="DeepRoyalMauve" Color="#6B4E71"/>
+        <SolidColorBrush x:Key="MidnightPlum" Color="#322935"/>
+        <SolidColorBrush x:Key="AntiqueRoseGold" Color="#9F7B7B"/>
+        <SolidColorBrush x:Key="SoftAshLavender" Color="#BDB2C4"/>
+        <SolidColorBrush x:Key="PearlFrost" Color="#F8F6F9"/>
+        <SolidColorBrush x:Key="CoolSilverMist" Color="#D1CCD6"/>
+
+        <!-- Graph/Data Visualization Colors -->
+        <SolidColorBrush x:Key="ChartPlotArea" Color="#F3EFF5"/>
+        <SolidColorBrush x:Key="GraphGridLines" Color="#E2DDE6"/>
+        <SolidColorBrush x:Key="AxisLabelGrey" Color="#5E5461"/>
+        <SolidColorBrush x:Key="DataSeriesPurple" Color="#8E7094"/>
+        <SolidColorBrush x:Key="DataSeriesRose" Color="#B78D8D"/>
+        <SolidColorBrush x:Key="DataSeriesBlueGrey" Color="#8BA4B3"/>
+
+        <!-- Mapped Resources -->
+        <LinearGradientBrush x:Key="WindowChromeBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F8F6F9" Offset="0" />
+            <GradientStop Color="#BDB2C4" Offset="1" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="AccentBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#6B4E71" Offset="0" />
+            <GradientStop Color="#9F7B7B" Offset="1" />
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="SubSurfaceBrush" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="SubtleTextBrush" Color="#5E5461" />
+        <SolidColorBrush x:Key="AccentTextBrush" Color="#6B4E71" />
+        <DropShadowEffect x:Key="CardShadow"
+                          Color="#BDB2C4"
+                          BlurRadius="25"
+                          ShadowDepth="0"
+                          Opacity="0.35"
+                          x:Shared="False" />
+        <Style x:Key="CardBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SubSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="#D1CCD6" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="24" />
+            <Setter Property="Padding" Value="24" />
+            <Setter Property="Effect" Value="{StaticResource CardShadow}" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="#6B4E71" />
+            <Setter Property="Padding" Value="18 12" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="18"
+                                Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#4A3550"
+                                                  BlurRadius="22"
+                                                  ShadowDepth="3"
+                                                  Direction="300"
+                                                  Opacity="0.45" />
+                            </Border.Effect>
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7D5E84" />
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#6B4E71"
+                                                          BlurRadius="32"
+                                                          ShadowDepth="4"
+                                                          Direction="300"
+                                                          Opacity="0.7" />
+                                    </Setter.Value>
+                                </Setter>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="border"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                             To="1.05"
+                                                             Duration="0:0:0.18" />
+                                            <DoubleAnimation Storyboard.TargetName="border"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                             To="1.05"
+                                                             Duration="0:0:0.18" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="border"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                             To="1"
+                                                             Duration="0:0:0.18" />
+                                            <DoubleAnimation Storyboard.TargetName="border"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                             To="1"
+                                                             Duration="0:0:0.18" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#5A4260" />
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="border"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                             To="0.98"
+                                                             Duration="0:0:0.08" />
+                                            <DoubleAnimation Storyboard.TargetName="border"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                             To="0.98"
+                                                             Duration="0:0:0.08" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid Margin="32">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="340" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Left rail -->
+            <StackPanel Grid.Column="0">
+                <StackPanel Margin="0 0 0 18">
+                    <TextBlock Text="Cell Morphology"
+                               FontSize="30"
+                               FontWeight="Bold"
+                               Foreground="#322935" />
+                    <TextBlock Text="Load microscopy frames, trigger segmentation, and inspect phenotype ratios without leaving this screen."
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource SubtleTextBrush}"
+                               Margin="0 8 0 0" />
+                </StackPanel>
+
+                <Border Style="{StaticResource CardBorderStyle}" Margin="0 0 0 18">
+                    <StackPanel>
+                        <TextBlock Text="Pipeline summary"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="#322935" />
+                        <Grid Margin="0 16 0 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Processed" Foreground="{StaticResource SubtleTextBrush}" />
+                                <TextBlock x:Name="TotalProcessedText"
+                                           Text="0"
+                                           FontSize="28"
+                                           FontWeight="Bold"
+                                           Foreground="#6B4E71" />
+                                <TextBlock x:Name="LastFileText"
+                                           Text="No files processed"
+                                           Foreground="{StaticResource SubtleTextBrush}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Current task" Foreground="{StaticResource SubtleTextBrush}" />
+                                <TextBlock x:Name="StatusMessageText"
+                                           Text="Waiting"
+                                           FontSize="28"
+                                           FontWeight="Bold"
+                                           Foreground="#8E7094" />
+                                <TextBlock x:Name="StatusSummaryText"
+                                           Text="Upload a microscopy frame to begin"
+                                           Foreground="{StaticResource SubtleTextBrush}" />
+                            </StackPanel>
+                        </Grid>
+                        <!-- Progress bar -->
+                        <StackPanel Margin="0 16 0 0">
+                            <ProgressBar x:Name="AnalysisProgressBar"
+                                         Height="6"
+                                         Minimum="0"
+                                         Maximum="100"
+                                         Value="0"
+                                         Background="#E2DDE6"
+                                         Foreground="#6B4E71" />
+                            <TextBlock x:Name="ProgressText"
+                                       Text=""
+                                       Foreground="{StaticResource SubtleTextBrush}"
+                                       FontSize="11"
+                                       Margin="0 4 0 0" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CardBorderStyle}" Margin="0 0 0 18">
+                    <StackPanel>
+                        <TextBlock Text="Actions"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="#322935"
+                                   Margin="0 0 0 10" />
+
+                        <!-- INPUT GROUP -->
+                        <TextBlock Text="INPUT"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#5E5461"
+                                   Margin="0 0 0 6" />
+                        <Grid Margin="0 0 0 8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="6"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="NewImageButton"
+                                    Grid.Column="0"
+                                    Content="📁 Select"
+                                    Background="#6B4E71"
+                                    Click="NewImageButton_Click"
+                                    ToolTip="Select image file" />
+                            <Button x:Name="ROIButton"
+                                    Grid.Column="2"
+                                    Content="🔲 ROI"
+                                    Background="#7B8E94"
+                                    Click="ROIButton_Click"
+                                    IsEnabled="False"
+                                    ToolTip="Select region of interest" />
+                        </Grid>
+
+                        <!-- ANALYSIS GROUP -->
+                        <TextBlock Text="ANALYSIS"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#5E5461"
+                                   Margin="0 6 0 6" />
+                        <Button x:Name="PredictButton"
+                                Content="▶ Run Analysis"
+                                Background="#28a745"
+                                Foreground="White"
+                                FontWeight="SemiBold"
+                                Click="PredictButton_Click"
+                                IsEnabled="False"
+                                Padding="12 10"
+                                Margin="0 0 0 6" />
+                        <Button x:Name="BatchButton"
+                                Content="📂 Batch Process"
+                                Background="#8E7094"
+                                Click="BatchButton_Click"
+                                Margin="0 0 0 8" />
+
+                        <!-- RESULTS GROUP (enabled after analysis) -->
+                        <TextBlock Text="RESULTS"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#5E5461"
+                                   Margin="0 6 0 6" />
+                        <Grid Margin="0 0 0 6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="6"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="ExportButton"
+                                    Grid.Column="0"
+                                    Content="💾 Export"
+                                    Background="#9F7B7B"
+                                    Click="ExportButton_Click"
+                                    IsEnabled="False"
+                                    ToolTip="Export results to file" />
+                            <Button x:Name="GenerateReportButton"
+                                    Grid.Column="2"
+                                    Content="📄 Report"
+                                    Background="#6B4E71"
+                                    Click="GenerateReportButton_Click"
+                                    IsEnabled="False"
+                                    ToolTip="Generate PDF report" />
+                        </Grid>
+                        <Grid Margin="0 0 0 8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="6"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="LabelEditorButton"
+                                    Grid.Column="0"
+                                    Content="🖌️ Labels"
+                                    Background="#8E7094"
+                                    Click="LabelEditorButton_Click"
+                                    IsEnabled="False"
+                                    ToolTip="Edit labels (requires login)" />
+                            <Button x:Name="MeasureButton"
+                                    Grid.Column="2"
+                                    Content="📏 Measure"
+                                    Background="#8BA4B3"
+                                    Click="MeasureButton_Click"
+                                    IsEnabled="False"
+                                    ToolTip="Measure distances" />
+                        </Grid>
+
+                        <!-- TOOLS GROUP -->
+                        <TextBlock Text="TOOLS"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#5E5461"
+                                   Margin="0 6 0 6" />
+                        <Grid Margin="0 0 0 6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="6"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="HistoryButton"
+                                    Grid.Column="0"
+                                    Content="📋 History"
+                                    Background="#8BA4B3"
+                                    Click="HistoryButton_Click"
+                                    ToolTip="View analysis history" />
+                            <Button x:Name="ChatButton"
+                                    Grid.Column="2"
+                                    Content="💬 AI Chat"
+                                    Background="#7B8E94"
+                                    Click="ChatButton_Click"
+                                    ToolTip="Chat with AI assistant" />
+                        </Grid>
+                        <Button x:Name="SettingsButton"
+                                Content="⚙️ Settings"
+                                Background="#5E5461"
+                                Click="SettingsButton_Click"
+                                ToolTip="Application settings" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CardBorderStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Class Distribution"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="#322935"
+                                   Margin="0 0 0 12" />
+                        <!-- Healthy -->
+                        <StackPanel Margin="0 0 0 8">
+                            <DockPanel>
+                                <TextBlock Text="Healthy" Foreground="#10B981" FontWeight="SemiBold" />
+                                <TextBlock x:Name="HealthyPercentText" Text="--%" Foreground="#10B981" HorizontalAlignment="Right" />
+                            </DockPanel>
+                            <Border Background="#E2DDE6" CornerRadius="3" Height="8" Margin="0 4 0 0">
+                                <Border x:Name="HealthyBar" Background="#10B981" CornerRadius="3" HorizontalAlignment="Left" Width="0" />
+                            </Border>
+                        </StackPanel>
+                        <!-- Affected -->
+                        <StackPanel Margin="0 0 0 8">
+                            <DockPanel>
+                                <TextBlock Text="Affected" Foreground="#EF4444" FontWeight="SemiBold" />
+                                <TextBlock x:Name="AffectedPercentText" Text="--%" Foreground="#EF4444" HorizontalAlignment="Right" />
+                            </DockPanel>
+                            <Border Background="#E2DDE6" CornerRadius="3" Height="8" Margin="0 4 0 0">
+                                <Border x:Name="AffectedBar" Background="#EF4444" CornerRadius="3" HorizontalAlignment="Left" Width="0" />
+                            </Border>
+                        </StackPanel>
+                        <!-- Irrelevant -->
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="Irrelevant" Foreground="#F59E0B" FontWeight="SemiBold" />
+                                <TextBlock x:Name="IrrelevantPercentText" Text="--%" Foreground="#F59E0B" HorizontalAlignment="Right" />
+                            </DockPanel>
+                            <Border Background="#E2DDE6" CornerRadius="3" Height="8" Margin="0 4 0 0">
+                                <Border x:Name="IrrelevantBar" Background="#F59E0B" CornerRadius="3" HorizontalAlignment="Left" Width="0" />
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- Right content area -->
+            <Grid Grid.Column="1" Margin="32 0 0 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Margin="0 0 0 18">
+                    <TextBlock x:Name="HeadlineText"
+                               Text="Waiting for sample"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               Foreground="#322935" />
+                    <TextBlock x:Name="SummaryText"
+                               Text="Upload a microscopy frame to unlock the workflow."
+                               Foreground="{StaticResource SubtleTextBrush}"
+                               Margin="0 6 0 0" />
+                </StackPanel>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="320" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <Grid>
+                            <TabControl x:Name="ImageTabControl" Background="Transparent" BorderThickness="0">
+                                <TabControl.Resources>
+                                    <Style TargetType="TabItem">
+                                        <Setter Property="Foreground" Value="#5E5461" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Padding" Value="12 8" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="TabItem">
+                                                    <Border x:Name="TabBorder" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}" Margin="2 0">
+                                                        <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" />
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsSelected" Value="True">
+                                                            <Setter TargetName="TabBorder" Property="Background" Value="#6B4E71" />
+                                                            <Setter Property="Foreground" Value="White" />
+                                                        </Trigger>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="TabBorder" Property="Background" Value="#BDB2C4" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </TabControl.Resources>
+                                <TabItem Header="Original">
+                                    <Border Background="#1A322935">
+                                        <Image x:Name="OriginalImage"
+                                               Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    </Border>
+                                </TabItem>
+                                <TabItem Header="Overlay">
+                                    <Border Background="#1A322935">
+                                        <Image x:Name="OverlayImage"
+                                               Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    </Border>
+                                </TabItem>
+                                <TabItem Header="Mask">
+                                    <Border Background="#1A322935">
+                                        <Image x:Name="MaskImage"
+                                               Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    </Border>
+                                </TabItem>
+                                <TabItem Header="Cell Count">
+                                    <Border Background="#1A322935">
+                                        <Image x:Name="CellCountImage"
+                                               Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    </Border>
+                                </TabItem>
+                                <TabItem Header="Cell Area">
+                                    <Border Background="#1A322935">
+                                        <Image x:Name="CellAreaImage"
+                                               Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    </Border>
+                                </TabItem>
+                            </TabControl>
+                            <Border x:Name="BusyOverlay"
+                                    Background="#99322935"
+                                    CornerRadius="24"
+                                    Visibility="Collapsed">
+                                <StackPanel HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Width="200">
+
+                                    <!-- Spinning Wheel -->
+                                    <Grid Width="80" Height="80" Margin="0 0 0 20">
+                                        <!-- Background circle -->
+                                        <Ellipse Stroke="#D1CCD6" StrokeThickness="6" Opacity="0.3"/>
+
+                                        <!-- Spinning arc -->
+                                        <Path x:Name="SpinnerArc"
+                                              Stroke="#6B4E71"
+                                              StrokeThickness="6"
+                                              StrokeStartLineCap="Round"
+                                              StrokeEndLineCap="Round"
+                                              Data="M 40,4 A 36,36 0 0 1 76,40"
+                                              RenderTransformOrigin="0.5,0.5">
+                                            <Path.RenderTransform>
+                                                <RotateTransform x:Name="SpinnerRotation" Angle="0"/>
+                                            </Path.RenderTransform>
+                                            <Path.Triggers>
+                                                <EventTrigger RoutedEvent="Path.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation
+                                                                Storyboard.TargetName="SpinnerRotation"
+                                                                Storyboard.TargetProperty="Angle"
+                                                                From="0" To="360"
+                                                                Duration="0:0:1"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Path.Triggers>
+                                        </Path>
+                                    </Grid>
+
+                                    <!-- Status text -->
+                                    <TextBlock x:Name="BusyStatusText"
+                                               Text="Processing..."
+                                               Foreground="#F8F6F9"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               HorizontalAlignment="Center"
+                                               Margin="0 0 0 8"/>
+
+                                    <!-- Detailed message -->
+                                    <TextBlock x:Name="BusyDetailText"
+                                               Text="Please wait..."
+                                               Foreground="#BDB2C4"
+                                               FontSize="12"
+                                               HorizontalAlignment="Center"
+                                               TextWrapping="Wrap"
+                                               TextAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            Margin="18 0 0 0"
+                            Style="{StaticResource CardBorderStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Analysis Plots"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 0 0 12" />
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <StackPanel x:Name="HistogramPanel">
+                                    <!-- KDE Distribution -->
+                                    <Border Background="#F3EFF5" CornerRadius="12" Padding="8" Margin="0 0 0 8" BorderBrush="#E2DDE6" BorderThickness="1" Cursor="Hand">
+                                        <StackPanel>
+                                            <TextBlock Text="Area Distribution (KDE)" Foreground="{StaticResource SubtleTextBrush}" FontSize="11" Margin="0 0 0 4" />
+                                            <Image x:Name="KdeHistogramImage" Stretch="Uniform" Height="140" RenderOptions.BitmapScalingMode="HighQuality" Tag="Area Distribution (KDE)" MouseLeftButtonDown="HistogramImage_Click" />
+                                        </StackPanel>
+                                    </Border>
+                                    <!-- Boxplot -->
+                                    <Border Background="#F3EFF5" CornerRadius="12" Padding="8" Margin="0 0 0 8" BorderBrush="#E2DDE6" BorderThickness="1" Cursor="Hand">
+                                        <StackPanel>
+                                            <TextBlock Text="Statistical Summary" Foreground="{StaticResource SubtleTextBrush}" FontSize="11" Margin="0 0 0 4" />
+                                            <Image x:Name="BoxplotImage" Stretch="Uniform" Height="140" RenderOptions.BitmapScalingMode="HighQuality" Tag="Statistical Summary" MouseLeftButtonDown="HistogramImage_Click" />
+                                        </StackPanel>
+                                    </Border>
+                                    <!-- Cumulative -->
+                                    <Border Background="#F3EFF5" CornerRadius="12" Padding="8" Margin="0 0 0 8" BorderBrush="#E2DDE6" BorderThickness="1" Cursor="Hand">
+                                        <StackPanel>
+                                            <TextBlock Text="Cumulative Distribution" Foreground="{StaticResource SubtleTextBrush}" FontSize="11" Margin="0 0 0 4" />
+                                            <Image x:Name="CumulativeImage" Stretch="Uniform" Height="140" RenderOptions.BitmapScalingMode="HighQuality" Tag="Cumulative Distribution" MouseLeftButtonDown="HistogramImage_Click" />
+                                        </StackPanel>
+                                    </Border>
+                                    <!-- Pie Chart -->
+                                    <Border Background="#F3EFF5" CornerRadius="12" Padding="8" Margin="0 0 0 8" BorderBrush="#E2DDE6" BorderThickness="1" Cursor="Hand">
+                                        <StackPanel>
+                                            <TextBlock Text="Size Categories" Foreground="{StaticResource SubtleTextBrush}" FontSize="11" Margin="0 0 0 4" />
+                                            <Image x:Name="PieChartImage" Stretch="Uniform" Height="140" RenderOptions.BitmapScalingMode="HighQuality" Tag="Size Categories" MouseLeftButtonDown="HistogramImage_Click" />
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <Border Grid.Row="2"
+                        Margin="0 18 0 0"
+                        Background="#FFFFFF"
+                        BorderBrush="#D1CCD6"
+                        BorderThickness="1"
+                        CornerRadius="16"
+                        Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Key Metrics"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="#322935"
+                                   Margin="0 0 0 12" />
+
+                        <ItemsControl x:Name="MetricsItemsControl" Grid.Row="1">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{Binding Background, FallbackValue=#F3EFF5}"
+                                            BorderBrush="#E2DDE6"
+                                            BorderThickness="1"
+                                            CornerRadius="12"
+                                            Margin="4"
+                                            Padding="14 10"
+                                            MinWidth="120">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Label}"
+                                                       Foreground="#5E5461"
+                                                       FontSize="11"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Value}"
+                                                       FontSize="18"
+                                                       FontWeight="Bold"
+                                                       Foreground="#322935"
+                                                       Margin="0 2 0 0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Onboarding overlay -->
+        <Border x:Name="OnboardingOverlay"
+                Background="#E6F8F6F9"
+                Panel.ZIndex="5"
+                AllowDrop="True"
+                DragEnter="OnboardingOverlay_DragEnter"
+                DragLeave="OnboardingOverlay_DragLeave"
+                Drop="OnboardingOverlay_Drop">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="30"
+                                  ShadowDepth="0"
+                                  Color="#BDB2C4"
+                                  Opacity="0.5" />
+            </Border.Effect>
+            <Grid>
+                <Border HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Width="460"
+                        Background="#FFFFFF"
+                        BorderBrush="#D1CCD6"
+                        BorderThickness="1"
+                        Padding="32"
+                        CornerRadius="24">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="40"
+                                          ShadowDepth="0"
+                                          Color="#BDB2C4"
+                                          Opacity="0.4" />
+                    </Border.Effect>
+                    <StackPanel>
+                        <TextBlock Text="Cell Morphology Studio"
+                                   FontSize="28"
+                                   FontWeight="Bold"
+                                   Foreground="#322935"
+                                   TextAlignment="Center" />
+                        <TextBlock Text="Upload a microscopy image to unlock segmentation and morphology analysis."
+                                   Foreground="{StaticResource SubtleTextBrush}"
+                                   TextAlignment="Center"
+                                   Margin="0 12 0 24"
+                                   TextWrapping="Wrap" />
+                        <Border x:Name="DropZone"
+                                BorderThickness="2"
+                                BorderBrush="#D1CCD6"
+                                CornerRadius="18"
+                                Padding="24"
+                                Margin="0 0 0 24"
+                                Background="#F3EFF5">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="📁"
+                                           FontSize="32"
+                                           TextAlignment="Center"
+                                           Margin="0 0 0 8" />
+                                <TextBlock Text="Drag &amp; drop image here"
+                                           Foreground="#322935"
+                                           FontWeight="SemiBold"
+                                           TextAlignment="Center" />
+                                <TextBlock Text="or use the button below"
+                                           Foreground="{StaticResource SubtleTextBrush}"
+                                           FontSize="12"
+                                           Margin="0 6 0 0"
+                                           TextAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <Button x:Name="SelectSampleButton"
+                                Content="Select microscopy image"
+                                Click="SelectSampleButton_Click"
+                                HorizontalAlignment="Center"
+                                Padding="28 12" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- History Panel Overlay -->
+        <Grid x:Name="HistoryPanel"
+              Visibility="Collapsed"
+              Panel.ZIndex="8"
+              Background="#E6F8F6F9">
+
+            <Border HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="800"
+                    MaxHeight="600"
+                    Background="#FFFFFF"
+                    CornerRadius="16"
+                    BorderBrush="#D1CCD6"
+                    BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect Color="#322935" BlurRadius="40" ShadowDepth="0" Opacity="0.3"/>
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Border Grid.Row="0" Background="#6B4E71" Padding="15" CornerRadius="16 16 0 0">
+                        <DockPanel>
+                            <Button x:Name="CloseHistoryButton"
+                                    Content="✕"
+                                    DockPanel.Dock="Right"
+                                    Width="32" Height="32"
+                                    Background="#9F7B7B"
+                                    Foreground="White"
+                                    FontSize="14"
+                                    Padding="0"
+                                    Click="CloseHistoryButton_Click"
+                                    Cursor="Hand"/>
+                            <TextBlock Text="Analysis History"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="White"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Toolbar -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="15 10" VerticalAlignment="Center">
+                        <!-- View toggle -->
+                        <Button x:Name="ListViewToggle"
+                                Content="List"
+                                Background="#6B4E71"
+                                Padding="12 6"
+                                Margin="0 0 5 0"
+                                Click="ListViewToggle_Click"/>
+                        <Button x:Name="GalleryViewToggle"
+                                Content="Gallery"
+                                Background="#BDB2C4"
+                                Padding="12 6"
+                                Margin="0 0 15 0"
+                                Click="GalleryViewToggle_Click"/>
+
+                        <!-- Search -->
+                        <TextBox x:Name="HistorySearchBox"
+                                 Width="150"
+                                 Padding="8 6"
+                                 Background="#F3EFF5"
+                                 BorderBrush="#D1CCD6"
+                                 Foreground="#322935"
+                                 TextChanged="HistorySearchBox_TextChanged"/>
+
+                        <!-- Date filters -->
+                        <TextBlock Text="From:" VerticalAlignment="Center" Margin="15 0 5 0" Foreground="#5E5461"/>
+                        <DatePicker x:Name="FromDatePicker"
+                                    Width="110"
+                                    SelectedDateChanged="DateFilter_Changed"/>
+                        <TextBlock Text="To:" VerticalAlignment="Center" Margin="10 0 5 0" Foreground="#5E5461"/>
+                        <DatePicker x:Name="ToDatePicker"
+                                    Width="110"
+                                    SelectedDateChanged="DateFilter_Changed"/>
+
+                        <!-- Clear All -->
+                        <Button Content="Clear All"
+                                Background="#9F7B7B"
+                                Padding="12 6"
+                                Margin="15 0 0 0"
+                                Click="ClearHistoryButton_Click"/>
+                    </StackPanel>
+
+                    <!-- List View -->
+                    <ListView x:Name="HistoryListView"
+                              Grid.Row="2"
+                              Margin="15 0 15 15"
+                              Background="Transparent"
+                              BorderThickness="0">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#F3EFF5"
+                                        CornerRadius="8"
+                                        Padding="10"
+                                        Margin="0 0 0 8"
+                                        BorderBrush="#D1CCD6"
+                                        BorderThickness="1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Thumbnail -->
+                                        <Border CornerRadius="4" Width="50" Height="50" Background="#E2DDE6">
+                                            <Image Source="{Binding ThumbnailFullPath}"
+                                                   Stretch="UniformToFill"/>
+                                        </Border>
+
+                                        <!-- Info -->
+                                        <StackPanel Grid.Column="1" Margin="10 0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding FileName}"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="#322935"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding ProcessedAt, StringFormat='yyyy-MM-dd HH:mm'}"
+                                                       Foreground="#5E5461"
+                                                       FontSize="11"/>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Cells: " Foreground="#5E5461" FontSize="11"/>
+                                                <TextBlock Text="{Binding TotalCells}" Foreground="#6B4E71" FontSize="11" FontWeight="SemiBold"/>
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <!-- Actions -->
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button Content="Load"
+                                                    Tag="{Binding Id}"
+                                                    Background="#6B4E71"
+                                                    Padding="10 6"
+                                                    Margin="0 0 5 0"
+                                                    Click="LoadHistoryEntry_Click"/>
+                                            <Button Content="✕"
+                                                    Tag="{Binding Id}"
+                                                    Background="#9F7B7B"
+                                                    Padding="8 6"
+                                                    Click="DeleteHistoryEntry_Click"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <!-- Gallery View -->
+                    <ScrollViewer Grid.Row="2"
+                                  x:Name="HistoryGalleryView"
+                                  Margin="15 0 15 15"
+                                  Visibility="Collapsed"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ItemsControl x:Name="HistoryGalleryItems">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="160"
+                                            Height="180"
+                                            Margin="5"
+                                            Background="#F3EFF5"
+                                            CornerRadius="8"
+                                            BorderBrush="#D1CCD6"
+                                            BorderThickness="1"
+                                            Cursor="Hand"
+                                            MouseLeftButtonDown="GalleryItem_Click">
+                                        <StackPanel>
+                                            <Border Height="120" CornerRadius="8 8 0 0" Background="#E2DDE6">
+                                                <Image Source="{Binding ThumbnailFullPath}"
+                                                       Stretch="UniformToFill"/>
+                                            </Border>
+                                            <TextBlock Text="{Binding FileName}"
+                                                       Margin="8 5 8 0"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Foreground="#322935"
+                                                       FontSize="11"
+                                                       FontWeight="SemiBold"/>
+                                            <StackPanel Orientation="Horizontal" Margin="8 2 8 5">
+                                                <TextBlock Text="{Binding ProcessedAt, StringFormat='MM/dd HH:mm'}"
+                                                           Foreground="#5E5461"
+                                                           FontSize="10"/>
+                                                <TextBlock Text=" | " Foreground="#5E5461" FontSize="10"/>
+                                                <TextBlock Text="{Binding TotalCells}" Foreground="#6B4E71" FontSize="10"/>
+                                                <TextBlock Text=" cells" Foreground="#5E5461" FontSize="10"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- AI Chat Panel Overlay -->
+        <Grid x:Name="ChatPanel"
+              Visibility="Collapsed"
+              Panel.ZIndex="9"
+              Background="#E6F8F6F9">
+
+            <Border HorizontalAlignment="Right"
+                    VerticalAlignment="Stretch"
+                    Width="400"
+                    Margin="0 20 20 20"
+                    Background="#FFFFFF"
+                    CornerRadius="16"
+                    BorderBrush="#D1CCD6"
+                    BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect Color="#322935" BlurRadius="40" ShadowDepth="0" Opacity="0.3"/>
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Border Grid.Row="0" Background="#6B4E71" CornerRadius="16 16 0 0" Padding="15">
+                        <DockPanel>
+                            <Button Content="✕"
+                                    DockPanel.Dock="Right"
+                                    Width="28" Height="28"
+                                    Background="#9F7B7B"
+                                    Foreground="White"
+                                    FontSize="12"
+                                    Padding="0"
+                                    Click="CloseChatButton_Click"
+                                    Cursor="Hand"/>
+                            <TextBlock Text="💬 AI Assistant"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="White"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Chat Messages -->
+                    <ScrollViewer x:Name="ChatScrollViewer"
+                                  Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Margin="10">
+                        <StackPanel x:Name="ChatMessagesPanel">
+                            <!-- Welcome message -->
+                            <Border Background="#F3EFF5" CornerRadius="12" Padding="12" Margin="0 0 40 10">
+                                <TextBlock TextWrapping="Wrap" Foreground="#322935" FontSize="13">
+                                    <Run FontWeight="SemiBold">Hello!</Run>
+                                    <LineBreak/>
+                                    <Run>I can help you understand your cell analysis results. Ask me anything about your data!</Run>
+                                </TextBlock>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Quick Actions -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10 5" HorizontalAlignment="Center">
+                        <Button Content="Explain Results"
+                                Background="#BDB2C4"
+                                Foreground="#322935"
+                                FontSize="11"
+                                Padding="10 6"
+                                Margin="3"
+                                Click="QuickChat_ExplainResults"/>
+                        <Button Content="Summary"
+                                Background="#BDB2C4"
+                                Foreground="#322935"
+                                FontSize="11"
+                                Padding="10 6"
+                                Margin="3"
+                                Click="QuickChat_Summary"/>
+                        <Button Content="Clear Chat"
+                                Background="#D1CCD6"
+                                Foreground="#322935"
+                                FontSize="11"
+                                Padding="10 6"
+                                Margin="3"
+                                Click="ClearChatButton_Click"/>
+                    </StackPanel>
+
+                    <!-- Input Area -->
+                    <Grid Grid.Row="3" Margin="10 5 10 15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="ChatInputBox"
+                                 Grid.Column="0"
+                                 Padding="12 10"
+                                 FontSize="13"
+                                 Background="#F8F6F9"
+                                 BorderBrush="#D1CCD6"
+                                 BorderThickness="1"
+                                 Text=""
+                                 VerticalContentAlignment="Center"
+                                 KeyDown="ChatInputBox_KeyDown">
+                            <TextBox.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="8"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+
+                        <Button x:Name="SendChatButton"
+                                Grid.Column="1"
+                                Content="Send"
+                                Background="#6B4E71"
+                                Padding="15 10"
+                                Margin="8 0 0 0"
+                                Click="SendChatButton_Click"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Label Editor Panel Overlay -->
+        <Grid x:Name="LabelEditorPanel"
+              Visibility="Collapsed"
+              Panel.ZIndex="10"
+              Background="#E6F8F6F9">
+
+            <Border HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Margin="20"
+                    Background="#FFFFFF"
+                    CornerRadius="16"
+                    BorderBrush="#D1CCD6"
+                    BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect Color="#322935" BlurRadius="40" ShadowDepth="0" Opacity="0.3"/>
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Border Grid.Row="0" Background="#6B4E71" CornerRadius="16 16 0 0" Padding="15">
+                        <DockPanel>
+                            <Button Content="✕"
+                                    DockPanel.Dock="Right"
+                                    Width="32" Height="32"
+                                    Background="#9F7B7B"
+                                    Foreground="White"
+                                    FontSize="14"
+                                    Padding="0"
+                                    Click="CloseLabelEditorButton_Click"
+                                    Cursor="Hand"/>
+                            <TextBlock Text="🖌️ Label Editor"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="White"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Main Content -->
+                    <Grid Grid.Row="1" Margin="15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Canvas Area -->
+                        <Border Grid.Column="0" Background="#F3EFF5" CornerRadius="12" Margin="0 0 10 0">
+                            <Grid>
+                                <ScrollViewer x:Name="LabelEditorScrollViewer"
+                                              HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Auto"
+                                              PanningMode="Both">
+                                    <Canvas x:Name="LabelEditorCanvas"
+                                            Background="Transparent"
+                                            MouseLeftButtonDown="LabelCanvas_MouseLeftButtonDown"
+                                            MouseMove="LabelCanvas_MouseMove"
+                                            MouseLeftButtonUp="LabelCanvas_MouseLeftButtonUp"
+                                            MouseRightButtonDown="LabelCanvas_MouseRightButtonDown">
+                                        <Image x:Name="LabelEditorImage"
+                                               Stretch="None"
+                                               RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                                        <Image x:Name="LabelEditorMask"
+                                               Stretch="None"
+                                               Opacity="0.5"
+                                               RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                                    </Canvas>
+                                </ScrollViewer>
+
+                                <!-- Zoom indicator -->
+                                <TextBlock x:Name="LabelZoomText"
+                                           Text="100%"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Bottom"
+                                           Margin="10"
+                                           Padding="8 4"
+                                           Background="#99322935"
+                                           Foreground="White"
+                                           FontSize="11"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Tools Panel -->
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Tools"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 0 0 10"/>
+
+                            <!-- Brush Size -->
+                            <TextBlock Text="Brush Size"
+                                       FontSize="11"
+                                       Foreground="#5E5461"
+                                       Margin="0 0 0 4"/>
+                            <Slider x:Name="BrushSizeSlider"
+                                    Minimum="1"
+                                    Maximum="50"
+                                    Value="10"
+                                    TickFrequency="5"
+                                    IsSnapToTickEnabled="False"
+                                    Margin="0 0 0 15"/>
+
+                            <TextBlock Text="Select Class"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 10 0 10"/>
+
+                            <!-- Class Buttons -->
+                            <RadioButton x:Name="BrushHealthy"
+                                         GroupName="BrushClass"
+                                         IsChecked="True"
+                                         Margin="0 0 0 8"
+                                         Cursor="Hand">
+                                <RadioButton.Template>
+                                    <ControlTemplate TargetType="RadioButton">
+                                        <Border x:Name="border"
+                                                Background="#D4EDDA"
+                                                BorderBrush="#28a745"
+                                                BorderThickness="2"
+                                                CornerRadius="8"
+                                                Padding="12 10">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Ellipse Width="16" Height="16" Fill="#28a745" Margin="0 0 8 0"/>
+                                                <TextBlock Text="Healthy" FontWeight="SemiBold" Foreground="#155724"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="border" Property="BorderThickness" Value="3"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </RadioButton.Template>
+                            </RadioButton>
+
+                            <RadioButton x:Name="BrushAffected"
+                                         GroupName="BrushClass"
+                                         Margin="0 0 0 8"
+                                         Cursor="Hand">
+                                <RadioButton.Template>
+                                    <ControlTemplate TargetType="RadioButton">
+                                        <Border x:Name="border"
+                                                Background="#F8D7DA"
+                                                BorderBrush="#dc3545"
+                                                BorderThickness="2"
+                                                CornerRadius="8"
+                                                Padding="12 10">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Ellipse Width="16" Height="16" Fill="#dc3545" Margin="0 0 8 0"/>
+                                                <TextBlock Text="Affected" FontWeight="SemiBold" Foreground="#721c24"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="border" Property="BorderThickness" Value="3"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </RadioButton.Template>
+                            </RadioButton>
+
+                            <RadioButton x:Name="BrushIrrelevant"
+                                         GroupName="BrushClass"
+                                         Margin="0 0 0 8"
+                                         Cursor="Hand">
+                                <RadioButton.Template>
+                                    <ControlTemplate TargetType="RadioButton">
+                                        <Border x:Name="border"
+                                                Background="#FFF3CD"
+                                                BorderBrush="#ffc107"
+                                                BorderThickness="2"
+                                                CornerRadius="8"
+                                                Padding="12 10">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Ellipse Width="16" Height="16" Fill="#ffc107" Margin="0 0 8 0"/>
+                                                <TextBlock Text="Irrelevant" FontWeight="SemiBold" Foreground="#856404"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="border" Property="BorderThickness" Value="3"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </RadioButton.Template>
+                            </RadioButton>
+
+                            <RadioButton x:Name="BrushBackground"
+                                         GroupName="BrushClass"
+                                         Margin="0 0 0 15"
+                                         Cursor="Hand">
+                                <RadioButton.Template>
+                                    <ControlTemplate TargetType="RadioButton">
+                                        <Border x:Name="border"
+                                                Background="#E2E3E5"
+                                                BorderBrush="#6c757d"
+                                                BorderThickness="2"
+                                                CornerRadius="8"
+                                                Padding="12 10">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Ellipse Width="16" Height="16" Fill="#6c757d" Margin="0 0 8 0"/>
+                                                <TextBlock Text="Background" FontWeight="SemiBold" Foreground="#383d41"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="border" Property="BorderThickness" Value="3"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </RadioButton.Template>
+                            </RadioButton>
+
+                            <!-- Selection Tool -->
+                            <TextBlock Text="Selection"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 10 0 10"/>
+
+                            <CheckBox x:Name="SelectModeCheckbox"
+                                      Content="Click to Select Label"
+                                      Foreground="#322935"
+                                      Margin="0 0 0 10"/>
+
+                            <TextBlock x:Name="SelectedLabelInfo"
+                                       Text="No selection"
+                                       FontSize="11"
+                                       Foreground="#5E5461"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Footer Actions -->
+                    <Border Grid.Row="2" Background="#F3EFF5" CornerRadius="0 0 16 16" Padding="15">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button Content="Undo"
+                                        Background="#BDB2C4"
+                                        Foreground="#322935"
+                                        Padding="15 10"
+                                        Margin="0 0 10 0"
+                                        Click="LabelEditorUndo_Click"/>
+                                <Button Content="Save Mask"
+                                        Background="#28a745"
+                                        Foreground="White"
+                                        Padding="15 10"
+                                        Click="LabelEditorSave_Click"/>
+                            </StackPanel>
+                            <TextBlock x:Name="LabelEditorStatus"
+                                       Text="Draw with brush or click to select labels"
+                                       Foreground="#5E5461"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Measurement Panel Overlay -->
+        <Grid x:Name="MeasurePanel"
+              Visibility="Collapsed"
+              Panel.ZIndex="10"
+              Background="#E6F8F6F9">
+
+            <Border HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Margin="20"
+                    Background="#FFFFFF"
+                    CornerRadius="16"
+                    BorderBrush="#D1CCD6"
+                    BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect Color="#322935" BlurRadius="40" ShadowDepth="0" Opacity="0.3"/>
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Border Grid.Row="0" Background="#8BA4B3" CornerRadius="16 16 0 0" Padding="15">
+                        <DockPanel>
+                            <Button Content="✕"
+                                    DockPanel.Dock="Right"
+                                    Width="32" Height="32"
+                                    Background="#6B8A9A"
+                                    Foreground="White"
+                                    FontSize="14"
+                                    Padding="0"
+                                    Click="CloseMeasurePanel_Click"
+                                    Cursor="Hand"/>
+                            <TextBlock Text="📏 Measurement Tool"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="White"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Main Content -->
+                    <Grid Grid.Row="1" Margin="15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="220"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Canvas Area -->
+                        <Border Grid.Column="0" Background="#F3EFF5" CornerRadius="12" Margin="0 0 10 0" ClipToBounds="True">
+                            <Grid>
+                                <ScrollViewer x:Name="MeasureScrollViewer"
+                                              HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Auto"
+                                              PreviewMouseWheel="MeasureScrollViewer_PreviewMouseWheel">
+                                    <Grid x:Name="MeasureCanvasContainer"
+                                          RenderTransformOrigin="0.5,0.5">
+                                        <Grid.RenderTransform>
+                                            <ScaleTransform x:Name="MeasureZoomTransform" ScaleX="1" ScaleY="1"/>
+                                        </Grid.RenderTransform>
+                                        <Image x:Name="MeasureImage"
+                                               Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <Canvas x:Name="MeasureCanvas"
+                                                Background="Transparent"
+                                                MouseLeftButtonDown="MeasureCanvas_MouseLeftButtonDown"
+                                                MouseMove="MeasureCanvas_MouseMove"
+                                                MouseLeftButtonUp="MeasureCanvas_MouseLeftButtonUp"
+                                                MouseRightButtonDown="MeasureCanvas_MouseRightButtonDown"/>
+                                    </Grid>
+                                </ScrollViewer>
+
+                                <!-- Scale bar -->
+                                <Border x:Name="ScaleBarContainer"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        Margin="15"
+                                        Background="#CC322935"
+                                        CornerRadius="6"
+                                        Padding="10 6">
+                                    <StackPanel>
+                                        <Border x:Name="ScaleBarLine"
+                                                Background="White"
+                                                Height="3"
+                                                Width="100"
+                                                HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="ScaleBarText"
+                                                   Text="100 µm"
+                                                   Foreground="White"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0 4 0 0"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- Tools Panel -->
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Calibration"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 0 0 10"/>
+
+                            <!-- Objective Selection -->
+                            <TextBlock Text="Objective"
+                                       FontSize="11"
+                                       Foreground="#5E5461"
+                                       Margin="0 0 0 4"/>
+                            <ComboBox x:Name="ObjectiveComboBox"
+                                      SelectedIndex="1"
+                                      SelectionChanged="ObjectiveComboBox_SelectionChanged"
+                                      Padding="10 8"
+                                      Margin="0 0 0 12">
+                                <ComboBoxItem Content="10x"/>
+                                <ComboBoxItem Content="20x"/>
+                                <ComboBoxItem Content="40x"/>
+                                <ComboBoxItem Content="60x"/>
+                                <ComboBoxItem Content="100x"/>
+                                <ComboBoxItem Content="Custom"/>
+                            </ComboBox>
+
+                            <!-- Pixel Size -->
+                            <TextBlock Text="Pixel Size (µm/pixel)"
+                                       FontSize="11"
+                                       Foreground="#5E5461"
+                                       Margin="0 0 0 4"/>
+                            <TextBox x:Name="PixelSizeTextBox"
+                                     Text="0.5"
+                                     Padding="10 8"
+                                     Background="White"
+                                     BorderBrush="#D1CCD6"
+                                     Foreground="#322935"
+                                     TextChanged="PixelSizeTextBox_TextChanged"
+                                     Margin="0 0 0 15"/>
+
+                            <TextBlock Text="Measurements"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 10 0 10"/>
+
+                            <!-- Current measurement -->
+                            <Border Background="#E8F4F8"
+                                    BorderBrush="#8BA4B3"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12"
+                                    Margin="0 0 0 10">
+                                <StackPanel>
+                                    <TextBlock Text="Current"
+                                               FontSize="11"
+                                               Foreground="#5E5461"/>
+                                    <TextBlock x:Name="CurrentMeasurementText"
+                                               Text="-- µm"
+                                               FontSize="22"
+                                               FontWeight="Bold"
+                                               Foreground="#2C5F7C"/>
+                                    <TextBlock x:Name="CurrentMeasurementPixels"
+                                               Text="(-- px)"
+                                               FontSize="11"
+                                               Foreground="#5E5461"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Measurements List -->
+                            <TextBlock Text="Saved Measurements"
+                                       FontSize="11"
+                                       Foreground="#5E5461"
+                                       Margin="0 5 0 4"/>
+                            <ListBox x:Name="MeasurementsListBox"
+                                     Height="120"
+                                     Background="#F8F6F9"
+                                     BorderBrush="#D1CCD6"
+                                     Padding="4"/>
+
+                            <!-- Statistics -->
+                            <Border Background="#F3EFF5"
+                                    CornerRadius="8"
+                                    Padding="10"
+                                    Margin="0 10 0 0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="0 0 0 6">
+                                        <TextBlock Text="Mean" FontSize="10" Foreground="#5E5461"/>
+                                        <TextBlock x:Name="MeasureMeanText" Text="--" FontWeight="SemiBold" Foreground="#322935"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0 0 0 6">
+                                        <TextBlock Text="Std Dev" FontSize="10" Foreground="#5E5461"/>
+                                        <TextBlock x:Name="MeasureStdText" Text="--" FontWeight="SemiBold" Foreground="#322935"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="0" Grid.Row="1">
+                                        <TextBlock Text="Min" FontSize="10" Foreground="#5E5461"/>
+                                        <TextBlock x:Name="MeasureMinText" Text="--" FontWeight="SemiBold" Foreground="#322935"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Grid.Row="1">
+                                        <TextBlock Text="Max" FontSize="10" Foreground="#5E5461"/>
+                                        <TextBlock x:Name="MeasureMaxText" Text="--" FontWeight="SemiBold" Foreground="#322935"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <TextBlock Text="💡 Click and drag to measure"
+                                       FontSize="10"
+                                       Foreground="#5E5461"
+                                       TextWrapping="Wrap"
+                                       Margin="0 12 0 0"/>
+                            <TextBlock Text="Right-click to delete a line"
+                                       FontSize="10"
+                                       Foreground="#5E5461"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Footer Actions -->
+                    <Border Grid.Row="2" Background="#F3EFF5" CornerRadius="0 0 16 16" Padding="15">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button Content="Clear All"
+                                        Background="#BDB2C4"
+                                        Foreground="#322935"
+                                        Padding="15 10"
+                                        Margin="0 0 10 0"
+                                        Click="ClearMeasurements_Click"/>
+                                <Button Content="Export"
+                                        Background="#8BA4B3"
+                                        Foreground="White"
+                                        Padding="15 10"
+                                        Click="ExportMeasurements_Click"/>
+                            </StackPanel>
+                            <TextBlock x:Name="MeasureStatusText"
+                                       Text="Click and drag on the image to measure distances"
+                                       Foreground="#5E5461"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ROI Selection Panel Overlay -->
+        <Grid x:Name="ROIPanel"
+              Visibility="Collapsed"
+              Panel.ZIndex="10"
+              Background="#E6F8F6F9">
+
+            <Border HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Margin="20"
+                    Background="#FFFFFF"
+                    CornerRadius="16"
+                    BorderBrush="#D1CCD6"
+                    BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect Color="#322935" BlurRadius="40" ShadowDepth="0" Opacity="0.3"/>
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Border Grid.Row="0" Background="#7B8E94" CornerRadius="16 16 0 0" Padding="15">
+                        <DockPanel>
+                            <Button Content="✕"
+                                    DockPanel.Dock="Right"
+                                    Width="32" Height="32"
+                                    Background="#5E7A84"
+                                    Foreground="White"
+                                    FontSize="14"
+                                    Padding="0"
+                                    Click="CloseROIPanel_Click"
+                                    Cursor="Hand"/>
+                            <TextBlock Text="🔲 Region of Interest Selection"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="White"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Main Content -->
+                    <Grid Grid.Row="1" Margin="15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Canvas Area -->
+                        <Border Grid.Column="0" Background="#F3EFF5" CornerRadius="12" Margin="0 0 10 0" ClipToBounds="True">
+                            <Grid>
+                                <ScrollViewer x:Name="ROIScrollViewer"
+                                              HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Auto"
+                                              PreviewMouseWheel="ROIScrollViewer_PreviewMouseWheel">
+                                    <Grid x:Name="ROICanvasContainer"
+                                          RenderTransformOrigin="0.5,0.5">
+                                        <Grid.RenderTransform>
+                                            <ScaleTransform x:Name="ROIZoomTransform" ScaleX="1" ScaleY="1"/>
+                                        </Grid.RenderTransform>
+                                        <Image x:Name="ROIImage"
+                                               Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <Canvas x:Name="ROICanvas"
+                                                Background="Transparent"
+                                                MouseLeftButtonDown="ROICanvas_MouseLeftButtonDown"
+                                                MouseMove="ROICanvas_MouseMove"
+                                                MouseLeftButtonUp="ROICanvas_MouseLeftButtonUp">
+                                            <!-- ROI Rectangle will be added here dynamically -->
+                                        </Canvas>
+                                    </Grid>
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+
+                        <!-- Tools Panel -->
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="ROI Info"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 0 0 15"/>
+
+                            <!-- Current ROI -->
+                            <Border Background="#E8F4F8"
+                                    BorderBrush="#7B8E94"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12"
+                                    Margin="0 0 0 15">
+                                <StackPanel>
+                                    <TextBlock Text="Selected Region"
+                                               FontSize="11"
+                                               Foreground="#5E5461"/>
+                                    <StackPanel Margin="0 8 0 0">
+                                        <DockPanel Margin="0 2">
+                                            <TextBlock Text="X:" Foreground="#5E5461" Width="50"/>
+                                            <TextBlock x:Name="ROI_X_Text" Text="--" Foreground="#322935" FontWeight="SemiBold"/>
+                                        </DockPanel>
+                                        <DockPanel Margin="0 2">
+                                            <TextBlock Text="Y:" Foreground="#5E5461" Width="50"/>
+                                            <TextBlock x:Name="ROI_Y_Text" Text="--" Foreground="#322935" FontWeight="SemiBold"/>
+                                        </DockPanel>
+                                        <DockPanel Margin="0 2">
+                                            <TextBlock Text="Width:" Foreground="#5E5461" Width="50"/>
+                                            <TextBlock x:Name="ROI_Width_Text" Text="--" Foreground="#322935" FontWeight="SemiBold"/>
+                                        </DockPanel>
+                                        <DockPanel Margin="0 2">
+                                            <TextBlock Text="Height:" Foreground="#5E5461" Width="50"/>
+                                            <TextBlock x:Name="ROI_Height_Text" Text="--" Foreground="#322935" FontWeight="SemiBold"/>
+                                        </DockPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Preset ROI sizes -->
+                            <TextBlock Text="Quick Select"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 0 0 10"/>
+
+                            <Button Content="512 × 512"
+                                    Background="#BDB2C4"
+                                    Foreground="#322935"
+                                    Padding="10 8"
+                                    Margin="0 0 0 5"
+                                    Click="ROIPreset512_Click"/>
+                            <Button Content="1024 × 1024"
+                                    Background="#BDB2C4"
+                                    Foreground="#322935"
+                                    Padding="10 8"
+                                    Margin="0 0 0 5"
+                                    Click="ROIPreset1024_Click"/>
+                            <Button Content="Center 50%"
+                                    Background="#BDB2C4"
+                                    Foreground="#322935"
+                                    Padding="10 8"
+                                    Margin="0 0 0 5"
+                                    Click="ROIPresetCenter_Click"/>
+                            <Button Content="Full Image"
+                                    Background="#BDB2C4"
+                                    Foreground="#322935"
+                                    Padding="10 8"
+                                    Margin="0 0 0 15"
+                                    Click="ROIPresetFull_Click"/>
+
+                            <TextBlock Text="💡 Click and drag to draw ROI"
+                                       FontSize="10"
+                                       Foreground="#5E5461"
+                                       TextWrapping="Wrap"
+                                       Margin="0 10 0 0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Footer Actions -->
+                    <Border Grid.Row="2" Background="#F3EFF5" CornerRadius="0 0 16 16" Padding="15">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button Content="Clear ROI"
+                                        Background="#BDB2C4"
+                                        Foreground="#322935"
+                                        Padding="15 10"
+                                        Margin="0 0 10 0"
+                                        Click="ClearROI_Click"/>
+                                <Button Content="Analyze ROI"
+                                        Background="#28a745"
+                                        Foreground="White"
+                                        Padding="15 10"
+                                        Click="AnalyzeROI_Click"/>
+                            </StackPanel>
+                            <TextBlock x:Name="ROIStatusText"
+                                       Text="Draw a rectangle to select region of interest"
+                                       Foreground="#5E5461"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Settings Panel Overlay -->
+        <Grid x:Name="SettingsPanel"
+              Visibility="Collapsed"
+              Panel.ZIndex="11"
+              Background="#E6F8F6F9">
+
+            <Border HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="600"
+                    MaxHeight="700"
+                    Background="#FFFFFF"
+                    CornerRadius="16"
+                    BorderBrush="#D1CCD6"
+                    BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect Color="#322935" BlurRadius="40" ShadowDepth="0" Opacity="0.3"/>
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Border Grid.Row="0" Background="#5E5461" CornerRadius="16 16 0 0" Padding="15">
+                        <DockPanel>
+                            <Button Content="✕"
+                                    DockPanel.Dock="Right"
+                                    Width="32" Height="32"
+                                    Background="#7A6B80"
+                                    Foreground="White"
+                                    FontSize="14"
+                                    Padding="0"
+                                    Click="CloseSettingsPanel_Click"
+                                    Cursor="Hand"/>
+                            <TextBlock Text="⚙️ Settings"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="White"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Settings Content -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="20">
+                        <StackPanel>
+                            <!-- Appearance Section -->
+                            <TextBlock Text="Appearance"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 0 0 15"/>
+
+                            <Border Background="#F3EFF5" CornerRadius="12" Padding="15" Margin="0 0 0 20">
+                                <StackPanel>
+                                    <!-- Dark Mode Toggle -->
+                                    <DockPanel Margin="0 0 0 15">
+                                        <StackPanel>
+                                            <TextBlock Text="Dark Mode"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="#322935"/>
+                                            <TextBlock Text="Switch to dark theme for low-light environments"
+                                                       FontSize="11"
+                                                       Foreground="#5E5461"/>
+                                        </StackPanel>
+                                        <CheckBox x:Name="DarkModeToggle"
+                                                  DockPanel.Dock="Right"
+                                                  VerticalAlignment="Center"
+                                                  Click="DarkModeToggle_Click"/>
+                                    </DockPanel>
+
+                                    <!-- Language -->
+                                    <DockPanel>
+                                        <StackPanel>
+                                            <TextBlock Text="Language"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="#322935"/>
+                                            <TextBlock Text="Interface language"
+                                                       FontSize="11"
+                                                       Foreground="#5E5461"/>
+                                        </StackPanel>
+                                        <ComboBox x:Name="LanguageComboBox"
+                                                  DockPanel.Dock="Right"
+                                                  Width="120"
+                                                  VerticalAlignment="Center"
+                                                  SelectedIndex="0">
+                                            <ComboBoxItem Content="English"/>
+                                            <ComboBoxItem Content="Türkçe"/>
+                                        </ComboBox>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Image Enhancement Section -->
+                            <TextBlock Text="Image Enhancement"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 0 0 15"/>
+
+                            <Border Background="#F3EFF5" CornerRadius="12" Padding="15" Margin="0 0 0 20">
+                                <StackPanel>
+                                    <!-- Brightness -->
+                                    <StackPanel Margin="0 0 0 15">
+                                        <DockPanel>
+                                            <TextBlock Text="Brightness" Foreground="#322935"/>
+                                            <TextBlock x:Name="BrightnessValueText"
+                                                       Text="0"
+                                                       DockPanel.Dock="Right"
+                                                       Foreground="#5E5461"/>
+                                        </DockPanel>
+                                        <Slider x:Name="BrightnessSlider"
+                                                Minimum="-100"
+                                                Maximum="100"
+                                                Value="0"
+                                                ValueChanged="ImageEnhancement_Changed"
+                                                Margin="0 8 0 0"/>
+                                    </StackPanel>
+
+                                    <!-- Contrast -->
+                                    <StackPanel Margin="0 0 0 15">
+                                        <DockPanel>
+                                            <TextBlock Text="Contrast" Foreground="#322935"/>
+                                            <TextBlock x:Name="ContrastValueText"
+                                                       Text="0"
+                                                       DockPanel.Dock="Right"
+                                                       Foreground="#5E5461"/>
+                                        </DockPanel>
+                                        <Slider x:Name="ContrastSlider"
+                                                Minimum="-100"
+                                                Maximum="100"
+                                                Value="0"
+                                                ValueChanged="ImageEnhancement_Changed"
+                                                Margin="0 8 0 0"/>
+                                    </StackPanel>
+
+                                    <!-- Saturation -->
+                                    <StackPanel Margin="0 0 0 15">
+                                        <DockPanel>
+                                            <TextBlock Text="Saturation" Foreground="#322935"/>
+                                            <TextBlock x:Name="SaturationValueText"
+                                                       Text="0"
+                                                       DockPanel.Dock="Right"
+                                                       Foreground="#5E5461"/>
+                                        </DockPanel>
+                                        <Slider x:Name="SaturationSlider"
+                                                Minimum="-100"
+                                                Maximum="100"
+                                                Value="0"
+                                                ValueChanged="ImageEnhancement_Changed"
+                                                Margin="0 8 0 0"/>
+                                    </StackPanel>
+
+                                    <!-- Sharpness -->
+                                    <StackPanel Margin="0 0 0 10">
+                                        <DockPanel>
+                                            <TextBlock Text="Sharpness" Foreground="#322935"/>
+                                            <TextBlock x:Name="SharpnessValueText"
+                                                       Text="0"
+                                                       DockPanel.Dock="Right"
+                                                       Foreground="#5E5461"/>
+                                        </DockPanel>
+                                        <Slider x:Name="SharpnessSlider"
+                                                Minimum="0"
+                                                Maximum="100"
+                                                Value="0"
+                                                ValueChanged="ImageEnhancement_Changed"
+                                                Margin="0 8 0 0"/>
+                                    </StackPanel>
+
+                                    <Button Content="Reset to Defaults"
+                                            Background="#BDB2C4"
+                                            Foreground="#322935"
+                                            Padding="10 8"
+                                            Click="ResetImageEnhancement_Click"
+                                            HorizontalAlignment="Left"
+                                            Margin="0 10 0 0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Model Parameters Section -->
+                            <TextBlock Text="Model Parameters"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 0 0 15"/>
+
+                            <Border Background="#F3EFF5" CornerRadius="12" Padding="15" Margin="0 0 0 20">
+                                <StackPanel>
+                                    <!-- Confidence Threshold -->
+                                    <StackPanel Margin="0 0 0 15">
+                                        <DockPanel>
+                                            <TextBlock Text="Confidence Threshold" Foreground="#322935"/>
+                                            <TextBlock x:Name="ConfidenceValueText"
+                                                       Text="0.5"
+                                                       DockPanel.Dock="Right"
+                                                       Foreground="#5E5461"/>
+                                        </DockPanel>
+                                        <Slider x:Name="ConfidenceSlider"
+                                                Minimum="0.1"
+                                                Maximum="0.9"
+                                                Value="0.5"
+                                                ValueChanged="ConfidenceSlider_Changed"
+                                                Margin="0 8 0 0"/>
+                                        <TextBlock Text="Higher values = more strict classification"
+                                                   FontSize="10"
+                                                   Foreground="#5E5461"
+                                                   Margin="0 4 0 0"/>
+                                    </StackPanel>
+
+                                    <!-- Min Cell Area -->
+                                    <StackPanel Margin="0 0 0 15">
+                                        <DockPanel>
+                                            <TextBlock Text="Min Cell Area (px²)" Foreground="#322935"/>
+                                            <TextBlock x:Name="MinCellAreaValueText"
+                                                       Text="100"
+                                                       DockPanel.Dock="Right"
+                                                       Foreground="#5E5461"/>
+                                        </DockPanel>
+                                        <Slider x:Name="MinCellAreaSlider"
+                                                Minimum="10"
+                                                Maximum="500"
+                                                Value="100"
+                                                ValueChanged="MinCellAreaSlider_Changed"
+                                                Margin="0 8 0 0"/>
+                                        <TextBlock Text="Cells smaller than this will be filtered out"
+                                                   FontSize="10"
+                                                   Foreground="#5E5461"
+                                                   Margin="0 4 0 0"/>
+                                    </StackPanel>
+
+                                    <!-- Overlay Opacity -->
+                                    <StackPanel>
+                                        <DockPanel>
+                                            <TextBlock Text="Overlay Opacity" Foreground="#322935"/>
+                                            <TextBlock x:Name="OverlayOpacityValueText"
+                                                       Text="50%"
+                                                       DockPanel.Dock="Right"
+                                                       Foreground="#5E5461"/>
+                                        </DockPanel>
+                                        <Slider x:Name="OverlayOpacitySlider"
+                                                Minimum="10"
+                                                Maximum="100"
+                                                Value="50"
+                                                ValueChanged="OverlayOpacitySlider_Changed"
+                                                Margin="0 8 0 0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Zoom/Pan Section -->
+                            <TextBlock Text="Zoom &amp; Navigation"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#322935"
+                                       Margin="0 0 0 15"/>
+
+                            <Border Background="#F3EFF5" CornerRadius="12" Padding="15" Margin="0 0 0 10">
+                                <StackPanel>
+                                    <TextBlock Text="Keyboard Shortcuts"
+                                               FontWeight="SemiBold"
+                                               Foreground="#322935"
+                                               Margin="0 0 0 10"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Scroll Wheel" Foreground="#5E5461" Margin="0 2"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="Zoom In/Out" Foreground="#322935" Margin="0 2"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Middle Click + Drag" Foreground="#5E5461" Margin="0 2"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="Pan Image" Foreground="#322935" Margin="0 2"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Ctrl + 0" Foreground="#5E5461" Margin="0 2"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="Reset Zoom" Foreground="#322935" Margin="0 2"/>
+
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Ctrl + F" Foreground="#5E5461" Margin="0 2"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="Fit to Window" Foreground="#322935" Margin="0 2"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Footer -->
+                    <Border Grid.Row="2" Background="#F3EFF5" CornerRadius="0 0 16 16" Padding="15">
+                        <DockPanel>
+                            <TextBlock Text="Settings are saved automatically"
+                                       Foreground="#5E5461"
+                                       VerticalAlignment="Center"
+                                       FontSize="11"/>
+                            <Button Content="Close"
+                                    DockPanel.Dock="Right"
+                                    Background="#5E5461"
+                                    Foreground="White"
+                                    Padding="20 10"
+                                    Click="CloseSettingsPanel_Click"/>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Image Popup Overlay -->
+        <Grid x:Name="ImagePopupOverlay"
+              Visibility="Collapsed"
+              Panel.ZIndex="10"
+              MouseLeftButtonDown="ImagePopupOverlay_MouseLeftButtonDown">
+
+            <!-- Dark overlay background -->
+            <Border Background="#99322935" />
+
+            <!-- Popup container -->
+            <Border x:Name="PopupContainer"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    MaxWidth="900"
+                    MaxHeight="700"
+                    Background="#FFFFFF"
+                    CornerRadius="16"
+                    Padding="20"
+                    BorderBrush="#D1CCD6"
+                    BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect Color="#322935" BlurRadius="50" ShadowDepth="0" Opacity="0.4"/>
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header with title and close button -->
+                    <DockPanel Grid.Row="0" Margin="0 0 0 15">
+                        <Button x:Name="PopupCloseButton"
+                                Content="✕"
+                                DockPanel.Dock="Right"
+                                Width="32" Height="32"
+                                Background="#9F7B7B"
+                                Foreground="White"
+                                FontSize="14"
+                                Padding="0"
+                                Click="PopupCloseButton_Click"
+                                Cursor="Hand"/>
+                        <TextBlock x:Name="PopupTitle"
+                                   Text="Analysis Plot"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="#322935"
+                                   VerticalAlignment="Center"/>
+                    </DockPanel>
+
+                    <!-- Zoomable/pannable image container -->
+                    <ScrollViewer Grid.Row="1"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto"
+                                  PanningMode="Both">
+                        <Grid x:Name="PopupImageContainer"
+                              MouseWheel="PopupImageContainer_MouseWheel">
+                            <Image x:Name="PopupImage"
+                                   Stretch="Uniform"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   RenderTransformOrigin="0.5,0.5">
+                                <Image.RenderTransform>
+                                    <ScaleTransform x:Name="PopupImageScale" ScaleX="1" ScaleY="1"/>
+                                </Image.RenderTransform>
+                            </Image>
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

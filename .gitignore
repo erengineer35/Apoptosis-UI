@@ -1,0 +1,64 @@
+# Environment variables (API keys)
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Build outputs
+bin/
+obj/
+
+# IDE
+.claude/
+.vs/
+.vscode/
+*.user
+*.suo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+debug_log.txt
+
+# Temporary files
+*.tmp
+*.temp
+uploaded_sample.*
+input.jpg
+
+# Test outputs
+timing_*.png
+benchmark_*.py
+
+# Local app data
+chat_history.json
+users.json
+settings.json
+history.json
+history_images/
+
+# Generated analysis outputs
+results.json
+report.pdf
+CellMorphology_Report_*.pdf
+analysis_report_*.pdf
+original.png
+overlay_*.png
+prediction_result_*.png
+cell_count.png
+cell_count.txt
+cell_area.png
+cell_area.txt
+[1-4]_*.png
+predict_test.txt
+_temp_report_*.jpg

@@ -64,6 +64,33 @@ Share the generated `https://...trycloudflare.com` URL only with intended users.
 
 The workstation must stay powered on, connected to the internet, and running both `uvicorn` and the tunnel.
 
+## GitHub Pages Frontend
+
+The `docs/` folder contains the static frontend for GitHub Pages.
+
+In GitHub repository settings:
+
+1. Open `Settings`.
+2. Open `Pages`.
+3. Set source to `Deploy from a branch`.
+4. Select branch `main`.
+5. Select folder `/docs`.
+6. Save.
+
+The frontend URL will be similar to:
+
+```text
+https://erengineer35.github.io/Apoptosis-UI/
+```
+
+The GitHub Pages frontend does not run Python or the model. Enter the live backend URL in the Backend URL field, for example:
+
+```text
+https://your-tunnel-url.trycloudflare.com
+```
+
+The frontend stores the backend URL in the browser so users do not need to re-enter it every time.
+
 ## Runtime Notes
 
 - One analysis runs at a time to avoid shared output file collisions from `process_images.py`.

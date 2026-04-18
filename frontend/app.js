@@ -4,10 +4,17 @@ const imageInput = document.getElementById("imageInput");
 const fileName = document.getElementById("fileName");
 const runButton = document.getElementById("runButton");
 const statusText = document.getElementById("statusText");
+const systemState = document.getElementById("systemState");
+const runTitle = document.getElementById("runTitle");
+const progressBar = document.getElementById("progressBar");
 const metricsGrid = document.getElementById("metricsGrid");
 const gallery = document.getElementById("gallery");
 const downloads = document.getElementById("downloads");
 const jsonOutput = document.getElementById("jsonOutput");
+const dropZone = document.getElementById("dropZone");
+const previewFrame = document.getElementById("previewFrame");
+const previewImage = document.getElementById("previewImage");
+
 const savedApiBase = localStorage.getItem("apoptosis_api_base") || "";
 const savedApiKey = localStorage.getItem("apoptosis_api_key") || "";
 
@@ -33,6 +40,13 @@ function apiBase() {
 function setStatus(message, isError = false) {
   statusText.textContent = message;
   statusText.classList.toggle("error", isError);
+  systemState.textContent = isError ? "Attention needed" : message;
+}
+
+function setProcessing(isProcessing) {
+  document.body.classList.toggle("is-processing", isProcessing);
+  runButton.disabled = isProcessing;
+  progressBar.style.width = isProcessing ? "100%" : "18%";
 }
 
 function authHeaders() {
@@ -49,6 +63,13 @@ function absoluteUrl(path) {
     return path;
   }
   return `${apiBase()}${path}`;
+}
+
+function clearResultAreas() {
+  metricsGrid.innerHTML = '<div class="empty-state">Metrics will appear after analysis.</div>';
+  gallery.innerHTML = '<div class="empty-state">Generated overlays, masks, and plots will appear here.</div>';
+  downloads.innerHTML = '<div class="empty-state">JSON, PDF, and text outputs will appear here.</div>';
+  jsonOutput.textContent = "{}";
 }
 
 function metric(label, value) {
@@ -116,6 +137,30 @@ function renderOutputs(outputs) {
     link.textContent = output.name;
     downloads.append(link);
   }
+
+  if (!gallery.children.length) {
+    gallery.innerHTML = '<div class="empty-state">No visual outputs were returned.</div>';
+  }
+
+  if (!downloads.children.length) {
+    downloads.innerHTML = '<div class="empty-state">No downloadable files were returned.</div>';
+  }
+}
+
+function loadPreview(file) {
+  fileName.textContent = file?.name || "PNG, JPG, TIFF, or BMP";
+  if (!file) {
+    previewFrame.classList.remove("has-image");
+    previewImage.removeAttribute("src");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.addEventListener("load", () => {
+    previewImage.src = reader.result;
+    previewFrame.classList.add("has-image");
+  });
+  reader.readAsDataURL(file);
 }
 
 async function runAnalysis() {
@@ -125,12 +170,10 @@ async function runAnalysis() {
     return;
   }
 
-  runButton.disabled = true;
-  setStatus("Uploading image and running analysis. Keep this page open.");
-  gallery.innerHTML = "";
-  downloads.innerHTML = "";
-  metricsGrid.innerHTML = "";
-  jsonOutput.textContent = "{}";
+  runTitle.textContent = "Analysis in progress";
+  setProcessing(true);
+  setStatus("Uploading image and running the analysis pipeline.");
+  clearResultAreas();
 
   const formData = new FormData();
   formData.append("file", file);
@@ -152,16 +195,42 @@ async function runAnalysis() {
     renderMetrics(payload.results || {});
     renderOutputs(payload.outputs || []);
     jsonOutput.textContent = JSON.stringify(payload, null, 2);
-    setStatus(`Analysis complete. Job ID: ${payload.job_id}`);
+    runTitle.textContent = "Analysis complete";
+    setStatus(`Complete. Job ID: ${payload.job_id}`);
+    progressBar.style.width = "100%";
   } catch (error) {
+    runTitle.textContent = "Analysis failed";
     setStatus(error.message || "Analysis failed.", true);
   } finally {
-    runButton.disabled = false;
+    setProcessing(false);
   }
 }
 
 imageInput.addEventListener("change", () => {
-  fileName.textContent = imageInput.files[0]?.name || "PNG, JPG, TIFF, or BMP";
+  loadPreview(imageInput.files[0]);
+});
+
+dropZone.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  dropZone.classList.add("dragging");
+});
+
+dropZone.addEventListener("dragleave", () => {
+  dropZone.classList.remove("dragging");
+});
+
+dropZone.addEventListener("drop", (event) => {
+  event.preventDefault();
+  dropZone.classList.remove("dragging");
+  const [file] = event.dataTransfer.files;
+  if (!file) {
+    return;
+  }
+
+  const transfer = new DataTransfer();
+  transfer.items.add(file);
+  imageInput.files = transfer.files;
+  loadPreview(file);
 });
 
 runButton.addEventListener("click", runAnalysis);

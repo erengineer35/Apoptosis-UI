@@ -7,59 +7,150 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <section class="intro">
-        <p class="eyebrow">ApoptosisUI</p>
-        <h1>Cell Morphology Studio</h1>
-        <p class="lead">
-          Upload a microscopy image, run the original analysis pipeline, and review segmentation, cell counts, area
-          statistics, plots, JSON, and PDF outputs.
-        </p>
-      </section>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">ApoptosisUI</p>
+          <h1>Cell Morphology Studio</h1>
+        </div>
+        <div class="system-pill">
+          <span class="pulse-dot"></span>
+          <span id="systemState">Backend ready</span>
+        </div>
+      </header>
 
-      <section class="workspace">
-        <aside class="controls">
-          <label class="field">
-            <span>Backend URL</span>
-            <input id="apiBaseInput" type="url" placeholder="https://your-tunnel.example.com" />
-          </label>
+      <section class="analysis-board">
+        <section class="intake-panel">
+          <div class="panel-heading">
+            <span class="section-kicker">Sample intake</span>
+            <h2>Microscopy frame</h2>
+            <p>Upload one image and start the original analysis pipeline.</p>
+          </div>
 
-          <label class="field">
-            <span>Access key</span>
-            <input id="apiKeyInput" type="password" placeholder="Optional" />
-          </label>
-
-          <label class="upload" for="imageInput">
-            <span class="upload-title">Select microscopy image</span>
-            <span id="fileName">PNG, JPG, TIFF, or BMP</span>
+          <label class="upload-zone" id="dropZone" for="imageInput">
             <input id="imageInput" type="file" accept=".png,.jpg,.jpeg,.tif,.tiff,.bmp,image/*" />
+            <span class="upload-mark">01</span>
+            <span class="upload-title">Drop image here or browse</span>
+            <span id="fileName" class="upload-detail">PNG, JPG, TIFF, or BMP</span>
           </label>
 
-          <button id="runButton" type="button">Run Analysis</button>
-          <p id="statusText" class="status">Waiting for image.</p>
-        </aside>
-
-        <section class="results">
-          <div class="summary">
-            <h2>Metrics</h2>
-            <div id="metricsGrid" class="metrics-grid"></div>
+          <div class="preview-frame" id="previewFrame">
+            <img id="previewImage" alt="Selected microscopy preview" />
+            <div class="preview-empty" id="previewEmpty">
+              <span></span>
+              <p>Selected sample preview appears here.</p>
+            </div>
           </div>
 
-          <div class="output-section">
-            <h2>Analysis Outputs</h2>
-            <div id="gallery" class="gallery"></div>
-          </div>
+          <button id="runButton" class="primary-action" type="button">
+            <span>Run Analysis</span>
+            <i></i>
+          </button>
 
-          <div class="output-section">
-            <h2>Downloads</h2>
-            <div id="downloads" class="downloads"></div>
-          </div>
-
-          <details class="raw-json">
-            <summary>Raw JSON</summary>
-            <pre id="jsonOutput">{}</pre>
+          <details class="connection-settings">
+            <summary>Connection settings</summary>
+            <label class="field">
+              <span>Backend URL</span>
+              <input id="apiBaseInput" type="url" placeholder="https://your-backend.example.com" />
+            </label>
+            <label class="field">
+              <span>Access key</span>
+              <input id="apiKeyInput" type="password" placeholder="Optional" />
+            </label>
           </details>
         </section>
+
+        <section class="run-panel">
+          <div class="panel-heading">
+            <span class="section-kicker">Run state</span>
+            <h2 id="runTitle">Waiting for sample</h2>
+            <p id="statusText" class="status">Select a microscopy image to begin.</p>
+          </div>
+
+          <div class="progress-shell" aria-hidden="true">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+
+          <div class="pipeline-list">
+            <div class="pipeline-step active">
+              <span>1</span>
+              <div>
+                <strong>Upload</strong>
+                <p>Sample transfer</p>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <span>2</span>
+              <div>
+                <strong>Inference</strong>
+                <p>Segmentation model</p>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <span>3</span>
+              <div>
+                <strong>Morphology</strong>
+                <p>Counts, areas, plots</p>
+              </div>
+            </div>
+            <div class="pipeline-step">
+              <span>4</span>
+              <div>
+                <strong>Report</strong>
+                <p>JSON and PDF outputs</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="class-legend">
+            <span><i class="healthy"></i>Healthy</span>
+            <span><i class="affected"></i>Affected</span>
+            <span><i class="irrelevant"></i>Irrelevant</span>
+          </div>
+        </section>
+      </section>
+
+      <section class="results-area">
+        <section class="summary result-panel">
+          <div class="section-row">
+            <div>
+              <span class="section-kicker">Quantification</span>
+              <h2>Metrics</h2>
+            </div>
+          </div>
+          <div id="metricsGrid" class="metrics-grid">
+            <div class="empty-state">Metrics will appear after analysis.</div>
+          </div>
+        </section>
+
+        <section class="output-section result-panel">
+          <div class="section-row">
+            <div>
+              <span class="section-kicker">Visual review</span>
+              <h2>Analysis outputs</h2>
+            </div>
+          </div>
+          <div id="gallery" class="gallery">
+            <div class="empty-state">Generated overlays, masks, and plots will appear here.</div>
+          </div>
+        </section>
+
+        <section class="output-section result-panel">
+          <div class="section-row">
+            <div>
+              <span class="section-kicker">Files</span>
+              <h2>Downloads</h2>
+            </div>
+          </div>
+          <div id="downloads" class="downloads">
+            <div class="empty-state">JSON, PDF, and text outputs will appear here.</div>
+          </div>
+        </section>
+
+        <details class="raw-json result-panel">
+          <summary>Raw JSON</summary>
+          <pre id="jsonOutput">{}</pre>
+        </details>
       </section>
     </main>
 

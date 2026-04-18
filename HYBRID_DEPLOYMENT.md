@@ -83,13 +83,13 @@ The frontend URL will be similar to:
 https://erengineer35.github.io/Apoptosis-UI/
 ```
 
-The GitHub Pages frontend does not run Python or the model. Enter the live backend URL in the Backend URL field, for example:
+The GitHub Pages page is configured as a stable entry point that opens the live ngrok app:
 
 ```text
-https://your-tunnel-url.trycloudflare.com
+https://engraving-sake-doing.ngrok-free.dev
 ```
 
-The frontend stores the backend URL in the browser so users do not need to re-enter it every time.
+The ngrok app serves both the HTML interface and the FastAPI backend from the same origin, which avoids browser cross-origin request failures.
 
 ## Runtime Notes
 

@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content="2; url=https://engraving-sake-doing.ngrok-free.dev" />
     <title>Cell Morphology Studio</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
@@ -11,58 +12,25 @@
       <section class="intro">
         <p class="eyebrow">ApoptosisUI</p>
         <h1>Cell Morphology Studio</h1>
-        <p class="lead">
-          Upload a microscopy image, run the original analysis pipeline, and review segmentation, cell counts, area
-          statistics, plots, JSON, and PDF outputs.
-        </p>
+        <p class="lead">Opening the analysis workspace.</p>
       </section>
 
       <section class="workspace">
         <aside class="controls">
-          <label class="field">
-            <span>Backend URL</span>
-            <input id="apiBaseInput" type="url" placeholder="https://your-tunnel.example.com" />
-          </label>
-
-          <label class="field">
-            <span>Access key</span>
-            <input id="apiKeyInput" type="password" placeholder="Optional" />
-          </label>
-
-          <label class="upload" for="imageInput">
-            <span class="upload-title">Select microscopy image</span>
-            <span id="fileName">PNG, JPG, TIFF, or BMP</span>
-            <input id="imageInput" type="file" accept=".png,.jpg,.jpeg,.tif,.tiff,.bmp,image/*" />
-          </label>
-
-          <button id="runButton" type="button">Run Analysis</button>
-          <p id="statusText" class="status">Waiting for image.</p>
+          <a class="launch-link" href="https://engraving-sake-doing.ngrok-free.dev">
+            Open Analysis App
+          </a>
+          <p class="status">
+            If the page does not open automatically, use the button above.
+          </p>
         </aside>
-
-        <section class="results">
-          <div class="summary">
-            <h2>Metrics</h2>
-            <div id="metricsGrid" class="metrics-grid"></div>
-          </div>
-
-          <div class="output-section">
-            <h2>Analysis Outputs</h2>
-            <div id="gallery" class="gallery"></div>
-          </div>
-
-          <div class="output-section">
-            <h2>Downloads</h2>
-            <div id="downloads" class="downloads"></div>
-          </div>
-
-          <details class="raw-json">
-            <summary>Raw JSON</summary>
-            <pre id="jsonOutput">{}</pre>
-          </details>
-        </section>
       </section>
     </main>
 
-    <script src="./app.js"></script>
+    <script>
+      window.setTimeout(() => {
+        window.location.replace("https://engraving-sake-doing.ngrok-free.dev");
+      }, 800);
+    </script>
   </body>
 </html>

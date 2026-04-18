@@ -242,6 +242,19 @@ h2 {
   text-decoration: none;
 }
 
+.launch-link {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 0 16px;
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .raw-json summary {
   cursor: pointer;
   font-weight: 700;

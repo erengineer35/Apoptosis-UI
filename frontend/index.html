@@ -1,1075 +1,991 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cell Morphology Studio</title>
+    
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
     <style>
 :root {
-  color-scheme: light;
-  --bg: #f4f6f2;
-  --surface: #ffffff;
-  --surface-soft: #eef3f0;
-  --ink: #18211e;
-  --muted: #637069;
-  --line: #d6ded8;
-  --accent: #087f68;
-  --accent-strong: #075f4f;
-  --cyan: #1589a6;
-  --red: #c53a31;
-  --amber: #c48717;
-  --dark: #101716;
-  --shadow: 0 18px 45px rgba(24, 33, 30, 0.12);
+    /* Color Palette - Pastel & Soft */
+    --bg-main: #f8f6f9;
+    --text-main: #322935;
+    --text-muted: #7b717d;
+    --primary: #8b6d91;
+    --primary-hover: #7a5d80;
+    --secondary: #bdb2c4;
+    --accent: #b78d8d;
+    
+    /* Status Colors */
+    --healthy: #4ade80;
+    --affected: #f87171;
+    --irrelevant: #fbbf24;
+
+    /* Glass Panels */
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-shadow: 0 8px 32px 0 rgba(107, 78, 113, 0.1);
+    
+    /* Typography */
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
 }
 
 * {
-  box-sizing: border-box;
-}
-
-html {
-  min-width: 320px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-body);
 }
 
 body {
-  margin: 0;
-  background:
-    linear-gradient(90deg, rgba(8, 127, 104, 0.05) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(21, 137, 166, 0.04) 1px, transparent 1px),
-    var(--bg);
-  background-size: 36px 36px;
-  color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-button,
-input {
-  font: inherit;
-}
-
-.app-shell {
-  width: min(1480px, 100%);
-  margin: 0 auto;
-  padding: 26px;
-}
-
-.topbar {
-  display: flex;
-  min-height: 92px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  margin-bottom: 18px;
-}
-
-.eyebrow,
-.section-kicker {
-  margin: 0 0 7px;
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-h1,
-h2,
-p {
-  margin: 0;
-}
-
-h1 {
-  font-size: 48px;
-  line-height: 1;
-}
-
-h2 {
-  font-size: 24px;
-  line-height: 1.1;
-}
-
-.system-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 11px 13px;
-  background: rgba(255, 255, 255, 0.84);
-  box-shadow: 0 8px 26px rgba(24, 33, 30, 0.08);
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.pulse-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  background: var(--accent);
-  box-shadow: 0 0 0 0 rgba(8, 127, 104, 0.55);
-  animation: pulse 1.8s infinite;
-}
-
-.analysis-board {
-  display: grid;
-  grid-template-columns: minmax(340px, 430px) 1fr;
-  gap: 18px;
-  align-items: stretch;
-}
-
-.intake-panel,
-.run-panel,
-.result-panel {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: var(--shadow);
-}
-
-.intake-panel,
-.run-panel {
-  min-height: 560px;
-  padding: 22px;
-}
-
-.panel-heading {
-  display: grid;
-  gap: 9px;
-}
-
-.panel-heading p,
-.status {
-  color: var(--muted);
-  line-height: 1.55;
-}
-
-.upload-zone {
-  position: relative;
-  display: grid;
-  min-height: 156px;
-  align-content: center;
-  gap: 9px;
-  margin-top: 22px;
-  border: 1px dashed #69a995;
-  border-radius: 8px;
-  padding: 20px;
-  background: var(--surface-soft);
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
-}
-
-.upload-zone::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--cyan), var(--amber), var(--red));
-  transform: translateX(-100%);
-  transition: transform 300ms ease;
-}
-
-.upload-zone:hover,
-.upload-zone.dragging {
-  transform: translateY(-2px);
-  border-color: var(--accent);
-  background: #e7f5ef;
-}
-
-.upload-zone:hover::after,
-.upload-zone.dragging::after {
-  transform: translateX(0);
-}
-
-.upload-zone input {
-  display: none;
-}
-
-.upload-mark {
-  display: inline-flex;
-  width: 42px;
-  height: 42px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: var(--dark);
-  color: #ffffff;
-  font-weight: 800;
-}
-
-.upload-title {
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.upload-detail {
-  color: var(--muted);
-  overflow-wrap: anywhere;
-}
-
-.preview-frame {
-  position: relative;
-  display: grid;
-  min-height: 220px;
-  margin-top: 16px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background:
-    radial-gradient(circle at 22% 26%, rgba(8, 127, 104, 0.2) 0 6px, transparent 7px),
-    radial-gradient(circle at 58% 35%, rgba(197, 58, 49, 0.2) 0 5px, transparent 6px),
-    radial-gradient(circle at 74% 68%, rgba(21, 137, 166, 0.22) 0 7px, transparent 8px),
-    #111816;
-  overflow: hidden;
-}
-
-.preview-frame img {
-  display: none;
-  width: 100%;
-  height: 100%;
-  min-height: 220px;
-  object-fit: contain;
-  background: #111816;
-}
-
-.preview-frame.has-image img {
-  display: block;
-}
-
-.preview-frame.has-image .preview-empty {
-  display: none;
-}
-
-.preview-empty {
-  display: grid;
-  place-items: center;
-  align-content: center;
-  gap: 12px;
-  padding: 18px;
-  color: #cbd8d3;
-  text-align: center;
-}
-
-.preview-empty span {
-  width: 82px;
-  height: 82px;
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  border-radius: 8px;
-  background:
-    radial-gradient(circle at 35% 34%, rgba(82, 207, 165, 0.9) 0 5px, transparent 6px),
-    radial-gradient(circle at 62% 56%, rgba(246, 188, 73, 0.9) 0 6px, transparent 7px),
-    radial-gradient(circle at 48% 70%, rgba(239, 92, 81, 0.8) 0 4px, transparent 5px),
-    rgba(255, 255, 255, 0.08);
-}
-
-.primary-action {
-  position: relative;
-  display: flex;
-  width: 100%;
-  min-height: 52px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 16px;
-  border: 0;
-  border-radius: 8px;
-  padding: 0 17px;
-  background: var(--accent);
-  color: #ffffff;
-  font-weight: 800;
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 160ms ease, background 160ms ease;
-}
-
-.primary-action i {
-  width: 26px;
-  height: 2px;
-  background: #ffffff;
-  transform-origin: right center;
-  transition: transform 180ms ease;
-}
-
-.primary-action:hover {
-  transform: translateY(-1px);
-  background: var(--accent-strong);
-}
-
-.primary-action:hover i {
-  transform: scaleX(1.35);
-}
-
-.primary-action:disabled {
-  cursor: wait;
-  opacity: 0.72;
-}
-
-.connection-settings {
-  margin-top: 16px;
-  border-top: 1px solid var(--line);
-  padding-top: 14px;
-}
-
-.connection-settings summary {
-  cursor: pointer;
-  color: var(--muted);
-  font-weight: 800;
-}
-
-.field {
-  display: grid;
-  gap: 6px;
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.field input {
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 12px;
-  color: var(--ink);
-}
-
-.run-panel {
-  display: grid;
-  grid-template-rows: auto auto 1fr auto;
-  gap: 22px;
-  background:
-    linear-gradient(135deg, rgba(16, 23, 22, 0.96), rgba(22, 35, 32, 0.96)),
-    #101716;
-  color: #ffffff;
-}
-
-.run-panel .section-kicker {
-  color: #79d9bd;
-}
-
-.run-panel .panel-heading p,
-.run-panel .status {
-  color: #b8c7c1;
-}
-
-.progress-shell {
-  height: 9px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  overflow: hidden;
-}
-
-.progress-bar {
-  width: 18%;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #55d6a9, #4db6d2, #f3b744);
-  transition: width 400ms ease;
-}
-
-body.is-processing .progress-bar {
-  width: 100%;
-  animation: progressFlow 1.4s ease-in-out infinite;
-}
-
-.pipeline-list {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(120px, 1fr));
-  gap: 12px;
-}
-
-.pipeline-step {
-  min-height: 150px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  padding: 14px;
-  background: rgba(255, 255, 255, 0.07);
-  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
-}
-
-.pipeline-step.active,
-body.is-processing .pipeline-step {
-  border-color: rgba(85, 214, 169, 0.55);
-  background: rgba(85, 214, 169, 0.12);
-}
-
-body.is-processing .pipeline-step {
-  animation: stepFloat 1.8s ease-in-out infinite;
-}
-
-body.is-processing .pipeline-step:nth-child(2) {
-  animation-delay: 130ms;
-}
-
-body.is-processing .pipeline-step:nth-child(3) {
-  animation-delay: 260ms;
-}
-
-body.is-processing .pipeline-step:nth-child(4) {
-  animation-delay: 390ms;
-}
-
-.pipeline-step span {
-  display: inline-flex;
-  width: 34px;
-  height: 34px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: #ffffff;
-  color: var(--dark);
-  font-weight: 900;
-}
-
-.pipeline-step strong {
-  display: block;
-  margin-top: 14px;
-  font-size: 18px;
-}
-
-.pipeline-step p {
-  margin-top: 7px;
-  color: #b8c7c1;
-  line-height: 1.45;
-}
-
-.class-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.class-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 8px;
-  padding: 9px 11px;
-  color: #dbe8e3;
-}
-
-.class-legend i {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-}
-
-.healthy {
-  background: #22b573;
-}
-
-.affected {
-  background: #dd4a42;
-}
-
-.irrelevant {
-  background: #e0a12a;
-}
-
-.results-area {
-  display: grid;
-  gap: 18px;
-  margin-top: 18px;
-}
-
-.result-panel {
-  padding: 20px;
-}
-
-.section-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(150px, 1fr));
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.metric {
-  min-height: 98px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 13px;
-  background: #fbfcfa;
-  transform: translateY(0);
-  animation: riseIn 260ms ease both;
-}
-
-.metric span {
-  display: block;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.metric strong {
-  display: block;
-  margin-top: 10px;
-  font-size: 25px;
-  overflow-wrap: anywhere;
-}
-
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(240px, 1fr));
-  gap: 14px;
-  margin-top: 16px;
-}
-
-.image-card {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  overflow: hidden;
-  background: #101716;
-  animation: riseIn 260ms ease both;
-}
-
-.image-card img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: contain;
-  background: #101716;
-  transition: transform 220ms ease;
-}
-
-.image-card:hover img {
-  transform: scale(1.018);
-}
-
-.image-card p {
-  margin: 0;
-  padding: 11px 12px;
-  background: #ffffff;
-  color: var(--ink);
-  font-weight: 800;
-}
-
-.downloads {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.downloads a {
-  border-radius: 8px;
-  padding: 11px 13px;
-  background: #e5f2ed;
-  color: var(--accent-strong);
-  font-weight: 800;
-  text-decoration: none;
-  transition: transform 160ms ease, background 160ms ease;
-}
-
-.downloads a:hover {
-  transform: translateY(-1px);
-  background: #d7ebe3;
-}
-
-.raw-json summary {
-  cursor: pointer;
-  font-weight: 800;
-}
-
-pre {
-  max-height: 420px;
-  overflow: auto;
-  border-radius: 8px;
-  padding: 14px;
-  background: #111816;
-  color: #e7f4ef;
-  white-space: pre-wrap;
-}
-
-.empty-state {
-  width: 100%;
-  border: 1px dashed var(--line);
-  border-radius: 8px;
-  padding: 18px;
-  color: var(--muted);
-  background: #fbfcfa;
-}
-
-@keyframes pulse {
-  70% {
-    box-shadow: 0 0 0 10px rgba(8, 127, 104, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgba(8, 127, 104, 0);
-  }
-}
-
-@keyframes progressFlow {
-  0%,
-  100% {
-    transform: translateX(-70%);
-  }
-
-  50% {
-    transform: translateX(0);
-  }
-}
-
-@keyframes stepFloat {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes riseIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (max-width: 1160px) {
-  .analysis-board,
-  .pipeline-list {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .metrics-grid,
-  .gallery {
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
-  }
-}
-
-@media (max-width: 760px) {
-  .app-shell {
-    padding: 16px;
-  }
-
-  .topbar,
-  .analysis-board,
-  .pipeline-list,
-  .metrics-grid,
-  .gallery {
-    grid-template-columns: 1fr;
-  }
-
-  .topbar {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    /* Soft mesh gradient background */
+    background-image: 
+        radial-gradient(at 10% 0%, rgba(189, 178, 196, 0.4) 0px, transparent 50%),
+        radial-gradient(at 90% 10%, rgba(159, 123, 123, 0.25) 0px, transparent 50%),
+        radial-gradient(at 50% 90%, rgba(107, 78, 113, 0.3) 0px, transparent 50%);
+    background-attachment: fixed;
+}
+
+/* 
+=============================
+  AMBIENT & MOUSE EFFECTS 
+=============================
+*/
+.cursor-glow {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+    transition: width 0.3s, height 0.3s;
+    mix-blend-mode: overlay;
+    opacity: 0.6;
+}
+
+.ambient-background {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+.blob {
+    position: absolute;
+    filter: blur(80px);
+    border-radius: 50%;
+    animation: float 20s infinite alternate;
+}
+.blob-1 { width: 400px; height: 400px; background: rgba(183, 141, 141, 0.3); top: -100px; left: -100px; animation-delay: 0s; }
+.blob-2 { width: 500px; height: 500px; background: rgba(139, 109, 145, 0.2); bottom: -150px; right: 10%; animation-delay: -5s; }
+.blob-3 { width: 300px; height: 300px; background: rgba(189, 178, 196, 0.4); top: 30%; left: 40%; animation-delay: -10s; }
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(100px, 50px) scale(1.1); }
+}
+
+/* 
+=============================
+  LAYOUTS
+=============================
+*/
+.app-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+}
+
+.hidden { display: none !important; }
+
+/* 
+=============================
+  TYPOGRAPHY & UTILS
+=============================
+*/
+h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; }
+a { color: var(--primary); text-decoration: none; font-weight: 500; transition: color 0.2s; }
+a:hover { color: var(--primary-hover); }
+
+.glass-card, .glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: var(--glass-shadow);
+}
+
+/* Animations */
+.fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.pulse {
+    animation: heartPulse 2s infinite;
+}
+@keyframes heartPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Button & Form Base */
+.btn {
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+.btn:active { transform: translateY(0); }
+.btn-block { width: 100%; display: flex; margin-bottom: 12px; }
+.btn.disabled { opacity: 0.5; pointer-events: none; }
+
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-secondary { background: var(--secondary); color: var(--text-main); }
+.btn-secondary:hover { background: #ab9eb4; }
+.btn-success { background: var(--healthy); color: white; }
+.btn-action { background: rgba(255,255,255,0.8); color: var(--text-main); }
+.btn-action:hover { background: white; }
+.btn-row { display: flex; gap: 8px; margin-bottom: 8px; }
+
+/* 
+=============================
+  LOGIN OVERLAY
+=============================
+*/
+.overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    background: rgba(248, 246, 249, 0.4);
+    backdrop-filter: blur(20px);
+}
+.login-card {
+    background: #fff;
+    width: 400px;
+    padding: 40px;
+    border-radius: 32px;
+    box-shadow: var(--glass-shadow);
+    text-align: center;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s;
+}
+.login-card .logo-area { margin-bottom: 32px; }
+.icon-wrap {
+    width: 64px; height: 64px;
+    background: var(--primary);
+    color: white;
+    font-size: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px auto;
+    box-shadow: 0 8px 24px rgba(139, 109, 145, 0.4);
+}
+.login-card h1 { font-size: 1.8rem; color: var(--text-main); margin: 0;}
+.login-card h2 { font-size: 1.8rem; color: var(--primary); font-weight: 300; margin-bottom: 8px; }
+.login-card p { font-size: 0.85rem; color: var(--text-muted); }
+
+.input-group { text-align: left; margin-bottom: 20px; }
+.input-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; padding-left: 4px; }
+.input-wrap {
+    position: relative;
+    display: flex; align-items: center;
+}
+.input-wrap i { position: absolute; left: 16px; color: var(--text-muted); }
+.input-wrap input {
+    width: 100%;
+    padding: 14px 16px 14px 40px;
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: #fcfcfc;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    outline: none;
+    color: var(--text-main);
+}
+.input-wrap input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139, 109, 145, 0.1); background: #fff;}
+.links { margin-top: 24px; font-size: 0.9rem; }
+
+/* 
+=============================
+  DASHBOARD LAYOUT
+=============================
+*/
+.dashboard-layout {
     display: grid;
-  }
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    padding: 24px;
+    height: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+}
 
-  h1 {
-    font-size: 36px;
-  }
+/* SIDEBAR */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 8px; /* scrollbar space */
+}
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
 
-  .intake-panel,
-  .run-panel {
-    min-height: auto;
+.sidebar-header h2 { font-size: 1.6rem; color: var(--text-main); margin-bottom: 4px; }
+.sidebar-header p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+.glass-card { padding: 20px; }
+.glass-card h3 { font-size: 1.1rem; margin-bottom: 16px; color: var(--text-main); }
+
+/* Sidebar: Summary Stats */
+.stats-grid { display: flex; gap: 16px; margin-bottom: 16px; }
+.stat-col { flex: 1; }
+.stat-col .label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;}
+.stat-col .value { display: block; font-size: 1.4rem; font-weight: 700; color: var(--primary); font-family: var(--font-heading);}
+
+.progress-wrap { background: rgba(255,255,255,0.6); padding: 12px; border-radius: 12px; }
+.progress-bar { height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+.progress-fill { height: 100%; width: 0%; background: var(--primary); transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.progress-text { font-size: 0.75rem; color: var(--text-muted); }
+
+/* Sidebar: Actions */
+.action-group { margin-bottom: 20px; }
+.action-group:last-child { margin-bottom: 0; }
+.group-label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px; }
+
+/* Sidebar: Distribution */
+.dist-item { margin-bottom: 14px; }
+.dist-item:last-child { margin-bottom: 0; }
+.dist-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+.dist-label.healthy { color: var(--healthy); }
+.dist-val.healthy { color: var(--healthy); }
+.dist-label.affected { color: var(--affected); }
+.dist-val.affected { color: var(--affected); }
+.dist-label.irrelevant { color: var(--irrelevant); }
+.dist-val.irrelevant { color: var(--irrelevant); }
+
+.dist-bar-wrap { height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden; }
+.dist-bar { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); }
+.bg-healthy { background: var(--healthy); }
+.bg-affected { background: var(--affected); }
+.bg-irrelevant { background: var(--irrelevant); }
+
+
+/* MAIN CONTENT PANEL */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.main-header { margin-bottom: 20px; }
+.main-header h1 { font-size: 2rem; color: var(--text-main); }
+.main-header p { font-size: 0.95rem; color: var(--text-muted); margin-top: 4px; }
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    flex: 1;
+    min-height: 0; 
+}
+
+/* Image Viewer Card */
+.viewer-card {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+}
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 0 8px;
+}
+.tab {
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.tab:hover { background: rgba(0,0,0,0.05); color: var(--text-main); }
+.tab.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(139, 109, 145, 0.3); }
+
+.viewer-area {
+    flex: 1;
+    background: rgba(255,255,255,0.4);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed rgba(0,0,0,0.1);
+    transition: all 0.3s;
+}
+
+.onboarding-dropzone {
+    text-align: center;
+    color: var(--text-muted);
+}
+.onboarding-dropzone i { font-size: 3rem; color: var(--primary); margin-bottom: 16px; opacity: 0.8; }
+.onboarding-dropzone h3 { color: var(--text-main); font-size: 1.2rem; margin-bottom: 4px; }
+
+.view-content {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn 0.4s ease forwards;
+}
+.viewer-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+.viewer-placeholder {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+.viewer-area.has-image {
+    border-style: solid;
+    background: rgba(255,255,255,0.7);
+}
+.result-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+.download-ready {
+    background: var(--primary) !important;
+    color: white !important;
+}
+.mock-overlay-img {
+    width: 80%; height: 80%;
+    background: url('https://images.unsplash.com/photo-1530973428-5bf2db014d02?auto=format&fit=crop&w=800&q=80') center/cover;
+    position: relative;
+    border-radius: 8px;
+}
+.mock-overlay-img::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, rgba(74, 222, 128, 0.2), rgba(74, 222, 128, 0.2) 10px, transparent 10px, transparent 20px);
+    border-radius: 8px;
+}
+
+/* Spinner */
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+.loading-overlay h4 { font-size: 1.2rem; color: var(--text-main); margin-top: 16px; margin-bottom: 4px; }
+.loading-overlay p { font-size: 0.85rem; color: var(--primary); }
+.spinner-container { width: 64px; height: 64px; }
+.spinner { animation: rotate 2s linear infinite; width: 100%; height: 100%; }
+.spinner .path {
+    stroke: var(--primary);
+    stroke-linecap: round;
+    animation: dash 1.5s ease-in-out infinite;
+}
+@keyframes rotate { 100% { transform: rotate(360deg); } }
+@keyframes dash {
+    0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+    50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+    100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+}
+
+/* Stats Panel */
+.stats-panel {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+.stats-panel::-webkit-scrollbar { width: 0; }
+.plots-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+.plot-box {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 16px;
     padding: 16px;
-  }
+    transition: transform 0.3s;
+    cursor: pointer;
+}
+.plot-box:hover { transform: translateY(-4px); background: #fff; }
+.plot-box span { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
+
+.mock-plot { width: 100%; height: 120px; border-radius: 8px; position: relative; overflow: hidden; }
+.kde-plot { background: linear-gradient(180deg, rgba(139, 109, 145, 0.2) 0%, transparent 100%); border-bottom: 2px solid var(--primary); }
+.kde-plot::after {
+    content:''; position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+    background: radial-gradient(ellipse at center, rgba(139, 109, 145, 0.5) 0%, transparent 70%);
+}
+.box-plot {
+    display: flex; justify-content: space-around; align-items: center; padding: 20px 0;
+}
+.box-plot::before, .box-plot::after {
+    content: ''; width: 24px; height: 60px; background: rgba(183, 141, 141, 0.4); border: 2px solid var(--accent); border-radius: 4px;
+}
+.box-plot::after { height: 80px; background: rgba(74, 222, 128, 0.3); border-color: var(--healthy); }
+.pie-plot {
+    border-radius: 50%;
+    width: 100px; height: 100px;
+    margin: 0 auto;
+    background: conic-gradient(var(--healthy) 0% 60%, var(--affected) 60% 85%, var(--irrelevant) 85% 100%);
+    box-shadow: inset 0 0 0 20px rgba(255,255,255,0.3);
+}
+
+/* 
+=============================
+  RESPONSIVE
+=============================
+*/
+@media (max-width: 1024px) {
+    .content-grid { grid-template-columns: 1fr; }
+    .stats-panel { height: 250px; flex-direction: row; align-items: stretch; overflow-x: auto; overflow-y: hidden;}
+    .plots-container { flex-direction: row; margin-top: 0; display: flex; width: max-content; }
+    .plot-box { width: 250px; }
+}
+
+@media (max-width: 768px) {
+    .dashboard-layout { grid-template-columns: 1fr; overflow-y: auto; height: auto;}
+    .app-container { overflow-y: auto; }
 }
 
 </style>
-  </head>
-  <body>
-    <main class="app-shell">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">ApoptosisUI</p>
-          <h1>Cell Morphology Studio</h1>
+</head>
+<body>
+    <!-- Background Mouse Glow Effect -->
+    <div class="cursor-glow"></div>
+    <div class="ambient-background">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app" class="app-container">
+        
+        <!-- LOGIN OVERLAY -->
+        <div id="login-overlay" class="overlay glass-panel active">
+            <div class="login-card">
+                <div class="logo-area">
+                    <div class="icon-wrap pulse"><i class="fa-solid fa-microscope"></i></div>
+                    <h1>Cell Morphology</h1>
+                    <h2>Studio</h2>
+                    <p>Apoptosis Detection System</p>
+                </div>
+                
+                <form id="login-form">
+                    <div class="input-group">
+                        <label>Username</label>
+                        <div class="input-wrap">
+                            <i class="fa-regular fa-user"></i>
+                            <input type="text" placeholder="Enter username" />
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <div class="input-wrap">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" placeholder="Enter password" />
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary btn-block ripple" id="btn-login">
+                        <span>Login</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-block ripple" id="btn-guest">
+                        <span>Continue as Guest</span>
+                    </button>
+                    
+                    <div class="links">
+                        <p>Don't have an account? <a href="#">Register</a></p>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="system-pill">
-          <span class="pulse-dot"></span>
-          <span id="systemState">Backend ready</span>
+
+        <!-- DASHBOARD CONTAINER -->
+        <div id="dashboard" class="dashboard-layout hidden">
+            
+            <!-- LEFT SIDEBAR -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>Cell Morphology</h2>
+                    <p>Load microscopy frames, trigger segmentation, and inspect phenotype ratios.</p>
+                </div>
+
+                <!-- Pipeline Summary Card -->
+                <div class="glass-card summary-card fade-in-up" style="animation-delay: 0.1s;">
+                    <h3>Pipeline summary</h3>
+                    <div class="stats-grid">
+                        <div class="stat-col">
+                            <span class="label">Processed</span>
+                            <span class="value" id="val-processed">0</span>
+                        </div>
+                        <div class="stat-col">
+                            <span class="label">Current task</span>
+                            <span class="value" id="val-status">Waiting</span>
+                        </div>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="analysis-progress"></div>
+                        </div>
+                        <span class="progress-text" id="analysis-progress-text">Upload a frame to begin</span>
+                    </div>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="glass-card actions-card fade-in-up" style="animation-delay: 0.2s;">
+                    <h3>Actions</h3>
+                    
+                    <div class="action-group">
+                        <span class="group-label">INPUT</span>
+                        <div class="btn-row">
+                            <button class="btn btn-action" id="btn-select-image" style="flex: 2;"><i class="fa-solid fa-folder-open"></i> Select</button>
+                            <input id="file-input" type="file" accept=".png,.jpg,.jpeg,.tif,.tiff,.bmp,image/*" hidden>
+                            <button class="btn btn-action disabled" style="flex: 1;"><i class="fa-solid fa-crop-simple"></i> ROI</button>
+                        </div>
+                    </div>
+
+                    <div class="action-group">
+                        <span class="group-label">ANALYSIS</span>
+                        <button class="btn btn-success btn-block ripple disabled" id="btn-run-analysis">
+                            <i class="fa-solid fa-play"></i> Run Analysis
+                        </button>
+                        <button class="btn btn-action btn-block"><i class="fa-solid fa-layer-group"></i> Batch Process</button>
+                    </div>
+
+                    <div class="action-group">
+                        <span class="group-label">RESULTS & TOOLS</span>
+                        <div class="btn-row">
+                            <button class="btn btn-action disabled" id="btn-export"><i class="fa-solid fa-download"></i> Export</button>
+                            <button class="btn btn-action disabled" id="btn-report"><i class="fa-solid fa-file-pdf"></i> Report</button>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-action"><i class="fa-solid fa-clock-rotate-left"></i> History</button>
+                            <button class="btn btn-action"><i class="fa-solid fa-robot"></i> AI Chat</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Class Distribution Card -->
+                <div class="glass-card distribution-card fade-in-up" style="animation-delay: 0.3s;">
+                    <h3>Class Distribution</h3>
+                    
+                    <div class="dist-item">
+                        <div class="dist-header">
+                            <span class="dist-label healthy">Healthy</span>
+                            <span class="dist-val healthy" id="dist-healthy">--%</span>
+                        </div>
+                        <div class="dist-bar-wrap"><div class="dist-bar bg-healthy" id="bar-healthy" style="width: 0%"></div></div>
+                    </div>
+                    
+                    <div class="dist-item">
+                        <div class="dist-header">
+                            <span class="dist-label affected">Affected</span>
+                            <span class="dist-val affected" id="dist-affected">--%</span>
+                        </div>
+                        <div class="dist-bar-wrap"><div class="dist-bar bg-affected" id="bar-affected" style="width: 0%"></div></div>
+                    </div>
+
+                    <div class="dist-item">
+                        <div class="dist-header">
+                            <span class="dist-label irrelevant">Irrelevant</span>
+                            <span class="dist-val irrelevant" id="dist-irrelevant">--%</span>
+                        </div>
+                        <div class="dist-bar-wrap"><div class="dist-bar bg-irrelevant" id="bar-irrelevant" style="width: 0%"></div></div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="main-content">
+                
+                <header class="main-header fade-in-up" style="animation-delay: 0.1s;">
+                    <h1 id="main-headline">Waiting for sample</h1>
+                    <p id="main-subline">Upload a microscopy frame to unlock the workflow.</p>
+                </header>
+
+                <div class="content-grid">
+                    <!-- Image Viewer -->
+                    <div class="glass-card viewer-card fade-in-up" style="animation-delay: 0.2s;">
+                        <nav class="tabs">
+                            <button class="tab active" data-target="view-original">Original</button>
+                            <button class="tab" data-target="view-overlay">Overlay</button>
+                            <button class="tab" data-target="view-mask">Mask</button>
+                            <button class="tab" data-target="view-cells">Cell Count</button>
+                        </nav>
+                        
+                        <div class="viewer-area" id="viewer-area">
+                            <div class="onboarding-dropzone" id="dropzone">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <h3>Drag & drop image here</h3>
+                                <p>or click to browse from files</p>
+                            </div>
+                            
+                            <!-- Images (Hidden initially) -->
+                            <div class="view-content hidden" id="view-original">
+                                <img src="https://images.unsplash.com/photo-1530973428-5bf2db014d02?auto=format&fit=crop&w=800&q=80" alt="Microscopy Original" class="viewer-img">
+                            </div>
+                            <div class="view-content hidden" id="view-overlay">
+                                <div class="mock-overlay-img"></div>
+                            </div>
+                            <div class="view-content hidden" id="view-mask">
+                                <p class="viewer-placeholder">Mask output will appear here.</p>
+                            </div>
+                            <div class="view-content hidden" id="view-cells">
+                                <p class="viewer-placeholder">Cell count output will appear here.</p>
+                            </div>
+                            
+                            <!-- Loading Overlay -->
+                            <div class="loading-overlay hidden" id="loading-overlay">
+                                <div class="spinner-container">
+                                    <svg class="spinner" viewBox="0 0 50 50">
+                                        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                                    </svg>
+                                </div>
+                                <h4>Processing sample...</h4>
+                                <p>Running ViT_UNet_CBAM segmentation</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side Stats Panel -->
+                    <div class="glass-card stats-panel fade-in-up" style="animation-delay: 0.3s;">
+                        <h3>Analysis Plots</h3>
+                        <div class="plots-container">
+                            <div class="plot-box">
+                                <span>Area Distribution (KDE)</span>
+                                <div class="mock-plot kde-plot" id="plot-kde"></div>
+                            </div>
+                            <div class="plot-box">
+                                <span>Statistical Summary</span>
+                                <div class="mock-plot box-plot" id="plot-box"></div>
+                            </div>
+                            <div class="plot-box">
+                                <span>Size Categories</span>
+                                <div class="mock-plot pie-plot" id="plot-pie"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
         </div>
-      </header>
+    </div>
 
-      <section class="analysis-board">
-        <section class="intake-panel">
-          <div class="panel-heading">
-            <span class="section-kicker">Sample intake</span>
-            <h2>Microscopy frame</h2>
-            <p>Upload one image and start the original analysis pipeline.</p>
-          </div>
-
-          <label class="upload-zone" id="dropZone" for="imageInput">
-            <input id="imageInput" type="file" accept=".png,.jpg,.jpeg,.tif,.tiff,.bmp,image/*" />
-            <span class="upload-mark">01</span>
-            <span class="upload-title">Drop image here or browse</span>
-            <span id="fileName" class="upload-detail">PNG, JPG, TIFF, or BMP</span>
-          </label>
-
-          <div class="preview-frame" id="previewFrame">
-            <img id="previewImage" alt="Selected microscopy preview" />
-            <div class="preview-empty" id="previewEmpty">
-              <span></span>
-              <p>Selected sample preview appears here.</p>
-            </div>
-          </div>
-
-          <button id="runButton" class="primary-action" type="button">
-            <span>Run Analysis</span>
-            <i></i>
-          </button>
-
-          <details class="connection-settings">
-            <summary>Connection settings</summary>
-            <label class="field">
-              <span>Backend URL</span>
-              <input id="apiBaseInput" type="url" placeholder="https://your-backend.example.com" />
-            </label>
-            <label class="field">
-              <span>Access key</span>
-              <input id="apiKeyInput" type="password" placeholder="Optional" />
-            </label>
-          </details>
-        </section>
-
-        <section class="run-panel">
-          <div class="panel-heading">
-            <span class="section-kicker">Run state</span>
-            <h2 id="runTitle">Waiting for sample</h2>
-            <p id="statusText" class="status">Select a microscopy image to begin.</p>
-          </div>
-
-          <div class="progress-shell" aria-hidden="true">
-            <div id="progressBar" class="progress-bar"></div>
-          </div>
-
-          <div class="pipeline-list">
-            <div class="pipeline-step active">
-              <span>1</span>
-              <div>
-                <strong>Upload</strong>
-                <p>Sample transfer</p>
-              </div>
-            </div>
-            <div class="pipeline-step">
-              <span>2</span>
-              <div>
-                <strong>Inference</strong>
-                <p>Segmentation model</p>
-              </div>
-            </div>
-            <div class="pipeline-step">
-              <span>3</span>
-              <div>
-                <strong>Morphology</strong>
-                <p>Counts, areas, plots</p>
-              </div>
-            </div>
-            <div class="pipeline-step">
-              <span>4</span>
-              <div>
-                <strong>Report</strong>
-                <p>JSON and PDF outputs</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="class-legend">
-            <span><i class="healthy"></i>Healthy</span>
-            <span><i class="affected"></i>Affected</span>
-            <span><i class="irrelevant"></i>Irrelevant</span>
-          </div>
-        </section>
-      </section>
-
-      <section class="results-area">
-        <section class="summary result-panel">
-          <div class="section-row">
-            <div>
-              <span class="section-kicker">Quantification</span>
-              <h2>Metrics</h2>
-            </div>
-          </div>
-          <div id="metricsGrid" class="metrics-grid">
-            <div class="empty-state">Metrics will appear after analysis.</div>
-          </div>
-        </section>
-
-        <section class="output-section result-panel">
-          <div class="section-row">
-            <div>
-              <span class="section-kicker">Visual review</span>
-              <h2>Analysis outputs</h2>
-            </div>
-          </div>
-          <div id="gallery" class="gallery">
-            <div class="empty-state">Generated overlays, masks, and plots will appear here.</div>
-          </div>
-        </section>
-
-        <section class="output-section result-panel">
-          <div class="section-row">
-            <div>
-              <span class="section-kicker">Files</span>
-              <h2>Downloads</h2>
-            </div>
-          </div>
-          <div id="downloads" class="downloads">
-            <div class="empty-state">JSON, PDF, and text outputs will appear here.</div>
-          </div>
-        </section>
-
-        <details class="raw-json result-panel">
-          <summary>Raw JSON</summary>
-          <pre id="jsonOutput">{}</pre>
-        </details>
-      </section>
-    </main>
-
+    <!-- Scripts -->
     <script>
-const apiBaseInput = document.getElementById("apiBaseInput");
-const apiKeyInput = document.getElementById("apiKeyInput");
-const imageInput = document.getElementById("imageInput");
-const fileName = document.getElementById("fileName");
-const runButton = document.getElementById("runButton");
-const statusText = document.getElementById("statusText");
-const systemState = document.getElementById("systemState");
-const runTitle = document.getElementById("runTitle");
-const progressBar = document.getElementById("progressBar");
-const metricsGrid = document.getElementById("metricsGrid");
-const gallery = document.getElementById("gallery");
-const downloads = document.getElementById("downloads");
-const jsonOutput = document.getElementById("jsonOutput");
-const dropZone = document.getElementById("dropZone");
-const previewFrame = document.getElementById("previewFrame");
-const previewImage = document.getElementById("previewImage");
+document.addEventListener("DOMContentLoaded", () => {
+  const cursorGlow = document.querySelector(".cursor-glow");
+  const loginOverlay = document.getElementById("login-overlay");
+  const dashboard = document.getElementById("dashboard");
+  const btnLogin = document.getElementById("btn-login");
+  const btnGuest = document.getElementById("btn-guest");
+  const tabs = document.querySelectorAll(".tab");
+  const views = document.querySelectorAll(".view-content");
+  const dropzone = document.getElementById("dropzone");
+  const btnSelect = document.getElementById("btn-select-image");
+  const fileInput = document.getElementById("file-input");
+  const btnRunAnalysis = document.getElementById("btn-run-analysis");
+  const loadingOverlay = document.getElementById("loading-overlay");
+  const analysisProgress = document.getElementById("analysis-progress");
+  const analysisProgressText = document.getElementById("analysis-progress-text");
+  const mainHeadline = document.getElementById("main-headline");
+  const mainSubline = document.getElementById("main-subline");
+  const valProcessed = document.getElementById("val-processed");
+  const valStatus = document.getElementById("val-status");
+  const barHealthy = document.getElementById("bar-healthy");
+  const barAffected = document.getElementById("bar-affected");
+  const barIrrelevant = document.getElementById("bar-irrelevant");
+  const distHealthy = document.getElementById("dist-healthy");
+  const distAffected = document.getElementById("dist-affected");
+  const distIrrelevant = document.getElementById("dist-irrelevant");
+  const btnExport = document.getElementById("btn-export");
+  const btnReport = document.getElementById("btn-report");
+  const viewerArea = document.getElementById("viewer-area");
 
-const savedApiBase = localStorage.getItem("apoptosis_api_base") || "";
-const savedApiKey = localStorage.getItem("apoptosis_api_key") || "";
+  let selectedFile = null;
+  let latestOutputs = [];
 
-apiBaseInput.value = savedApiBase;
-apiKeyInput.value = savedApiKey;
-
-const imageOutputNames = new Set([
-  "original.png",
-  "prediction_result_predict.png",
-  "overlay_predict.png",
-  "cell_count.png",
-  "cell_area.png",
-  "1_cell_area_distribution_kde.png",
-  "2_cell_area_boxplot.png",
-  "3_cell_area_cumulative.png",
-  "4_cell_size_categories.png",
-]);
-
-function apiBase() {
-  return (apiBaseInput.value.trim() || window.location.origin).replace(/\/$/, "");
-}
-
-function setStatus(message, isError = false) {
-  statusText.textContent = message;
-  statusText.classList.toggle("error", isError);
-  systemState.textContent = isError ? "Attention needed" : message;
-}
-
-function setProcessing(isProcessing) {
-  document.body.classList.toggle("is-processing", isProcessing);
-  runButton.disabled = isProcessing;
-  progressBar.style.width = isProcessing ? "100%" : "18%";
-}
-
-function authHeaders() {
-  const key = apiKeyInput.value.trim();
-  const headers = { "ngrok-skip-browser-warning": "1" };
-  if (key) {
-    headers["X-API-Key"] = key;
-  }
-  return headers;
-}
-
-function absoluteUrl(path) {
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
-  }
-  return `${apiBase()}${path}`;
-}
-
-function clearResultAreas() {
-  metricsGrid.innerHTML = '<div class="empty-state">Metrics will appear after analysis.</div>';
-  gallery.innerHTML = '<div class="empty-state">Generated overlays, masks, and plots will appear here.</div>';
-  downloads.innerHTML = '<div class="empty-state">JSON, PDF, and text outputs will appear here.</div>';
-  jsonOutput.textContent = "{}";
-}
-
-function metric(label, value) {
-  const card = document.createElement("div");
-  card.className = "metric";
-  card.innerHTML = `<span></span><strong></strong>`;
-  card.querySelector("span").textContent = label;
-  card.querySelector("strong").textContent = value ?? "-";
-  return card;
-}
-
-function renderMetrics(results) {
-  const stats = results.statistics || {};
-  const classDistribution = stats.class_distribution || {};
-  const areaStats = stats.area_stats || {};
-  const byClass = stats.cell_counts_by_class || {};
-
-  metricsGrid.innerHTML = "";
-  metricsGrid.append(
-    metric("Cell count", stats.cell_count),
-    metric("Total cells", stats.total_cells),
-    metric("Mean cell area", `${stats.mean_cell_area ?? 0} px`),
-    metric("Healthy", byClass.healthy ?? 0),
-    metric("Affected", byClass.affected ?? 0),
-    metric("Irrelevant", byClass.irrelevant ?? 0),
-    metric("Healthy pixels", `${classDistribution.healthy?.percent ?? 0}%`),
-    metric("Affected pixels", `${classDistribution.affected?.percent ?? 0}%`),
-    metric("Median area", areaStats.median ?? 0),
-    metric("Std area", areaStats.std ?? 0),
-    metric("Min area", areaStats.min ?? 0),
-    metric("Max area", areaStats.max ?? 0),
-  );
-}
-
-function labelFromName(name) {
-  return name
-    .replace(/^\d+_/, "")
-    .replace(/_/g, " ")
-    .replace(/\.[^.]+$/, "")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function renderOutputs(outputs) {
-  gallery.innerHTML = "";
-  downloads.innerHTML = "";
-
-  for (const output of outputs) {
-    const url = absoluteUrl(output.url);
-    if (imageOutputNames.has(output.name)) {
-      const card = document.createElement("article");
-      card.className = "image-card";
-      const image = document.createElement("img");
-      image.src = url;
-      image.alt = labelFromName(output.name);
-      const caption = document.createElement("p");
-      caption.textContent = labelFromName(output.name);
-      card.append(image, caption);
-      gallery.append(card);
-    }
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.target = "_blank";
-    link.rel = "noopener";
-    link.textContent = output.name;
-    downloads.append(link);
-  }
-
-  if (!gallery.children.length) {
-    gallery.innerHTML = '<div class="empty-state">No visual outputs were returned.</div>';
-  }
-
-  if (!downloads.children.length) {
-    downloads.innerHTML = '<div class="empty-state">No downloadable files were returned.</div>';
-  }
-}
-
-function loadPreview(file) {
-  fileName.textContent = file?.name || "PNG, JPG, TIFF, or BMP";
-  if (!file) {
-    previewFrame.classList.remove("has-image");
-    previewImage.removeAttribute("src");
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.addEventListener("load", () => {
-    previewImage.src = reader.result;
-    previewFrame.classList.add("has-image");
+  document.addEventListener("mousemove", (event) => {
+    cursorGlow.style.left = `${event.clientX}px`;
+    cursorGlow.style.top = `${event.clientY}px`;
   });
-  reader.readAsDataURL(file);
-}
 
-async function runAnalysis() {
-  const file = imageInput.files[0];
-  if (!file) {
-    setStatus("Select a microscopy image first.", true);
-    return;
+  function animateLoginToDashboard() {
+    const card = loginOverlay.querySelector(".login-card");
+    card.style.transform = "scale(0.9)";
+    card.style.opacity = "0";
+
+    setTimeout(() => {
+      loginOverlay.classList.remove("active");
+      loginOverlay.classList.add("hidden");
+      dashboard.classList.remove("hidden");
+
+      dashboard.querySelectorAll(".fade-in-up").forEach((element) => {
+        element.style.animation = "none";
+        element.offsetHeight;
+        element.style.animation = null;
+      });
+    }, 500);
   }
 
-  runTitle.textContent = "Analysis in progress";
-  setProcessing(true);
-  setStatus("Uploading image and running the analysis pipeline.");
-  clearResultAreas();
+  btnLogin.addEventListener("click", animateLoginToDashboard);
+  btnGuest.addEventListener("click", animateLoginToDashboard);
 
-  const formData = new FormData();
-  formData.append("file", file);
-  localStorage.setItem("apoptosis_api_base", apiBaseInput.value.trim());
-  localStorage.setItem("apoptosis_api_key", apiKeyInput.value.trim());
+  function selectTab(targetId) {
+    tabs.forEach((tab) => tab.classList.toggle("active", tab.getAttribute("data-target") === targetId));
+    views.forEach((view) => view.classList.toggle("hidden", view.id !== targetId));
+  }
 
-  try {
-    const response = await fetch(`${apiBase()}/api/analyze`, {
-      method: "POST",
-      headers: authHeaders(),
-      body: formData,
-    });
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => selectTab(tab.getAttribute("data-target")));
+  });
 
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      throw new Error(payload.detail || `Analysis failed with HTTP ${response.status}`);
+  function outputUrl(name) {
+    const found = latestOutputs.find((output) => output.name === name);
+    return found ? found.url : "";
+  }
+
+  function absoluteUrl(path) {
+    if (!path) return "";
+    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    return `${window.location.origin}${path}`;
+  }
+
+  function setImage(targetId, url, alt) {
+    const target = document.getElementById(targetId);
+    if (!url) {
+      target.innerHTML = `<p class="viewer-placeholder">${alt} is not available.</p>`;
+      return;
+    }
+    target.innerHTML = `<img class="result-img" src="${absoluteUrl(url)}" alt="${alt}">`;
+  }
+
+  function setPlot(targetId, url, alt) {
+    const target = document.getElementById(targetId);
+    if (!url) return;
+    target.className = "mock-plot";
+    target.innerHTML = `<img class="result-img" src="${absoluteUrl(url)}" alt="${alt}">`;
+  }
+
+  function resetResults() {
+    analysisProgress.style.width = "0%";
+    analysisProgressText.innerText = "Upload a frame to begin";
+    distHealthy.innerText = "--%";
+    distAffected.innerText = "--%";
+    distIrrelevant.innerText = "--%";
+    barHealthy.style.width = "0%";
+    barAffected.style.width = "0%";
+    barIrrelevant.style.width = "0%";
+    btnExport.classList.add("disabled");
+    btnReport.classList.add("disabled");
+    btnExport.classList.remove("download-ready");
+    btnReport.classList.remove("download-ready");
+  }
+
+  function handleImageLoad(file) {
+    selectedFile = file;
+    resetResults();
+
+    const previewUrl = URL.createObjectURL(file);
+    dropzone.classList.add("hidden");
+    viewerArea.classList.add("has-image");
+    document.getElementById("view-original").innerHTML =
+      `<img src="${previewUrl}" alt="Selected microscopy frame" class="viewer-img">`;
+    selectTab("view-original");
+
+    btnRunAnalysis.classList.remove("disabled");
+    mainHeadline.innerText = `${file.name} loaded`;
+    mainSubline.innerText = "Ready for segmentation. Click Run Analysis to begin.";
+    valStatus.innerText = "Ready";
+  }
+
+  btnSelect.addEventListener("click", () => fileInput.click());
+
+  fileInput.addEventListener("change", () => {
+    const [file] = fileInput.files;
+    if (file) handleImageLoad(file);
+  });
+
+  dropzone.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    dropzone.style.background = "rgba(255, 255, 255, 0.8)";
+  });
+
+  dropzone.addEventListener("dragleave", (event) => {
+    event.preventDefault();
+    dropzone.style.background = "transparent";
+  });
+
+  dropzone.addEventListener("drop", (event) => {
+    event.preventDefault();
+    dropzone.style.background = "transparent";
+    const [file] = event.dataTransfer.files;
+    if (!file) return;
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    fileInput.files = transfer.files;
+    handleImageLoad(file);
+  });
+
+  function setProgress(percent, text) {
+    analysisProgress.style.width = `${percent}%`;
+    analysisProgressText.innerText = text;
+  }
+
+  function updateDistribution(results) {
+    const distribution = results?.statistics?.class_distribution || {};
+    const healthy = distribution.healthy?.percent || 0;
+    const affected = distribution.affected?.percent || 0;
+    const irrelevant = distribution.irrelevant?.percent || 0;
+
+    barHealthy.style.width = `${healthy}%`;
+    distHealthy.innerText = `${healthy}%`;
+    barAffected.style.width = `${affected}%`;
+    distAffected.innerText = `${affected}%`;
+    barIrrelevant.style.width = `${irrelevant}%`;
+    distIrrelevant.innerText = `${irrelevant}%`;
+  }
+
+  function wireDownloads() {
+    const results = outputUrl("results.json");
+    const report = outputUrl("report.pdf");
+
+    if (results) {
+      btnExport.classList.remove("disabled");
+      btnExport.classList.add("download-ready");
+      btnExport.onclick = () => window.open(absoluteUrl(results), "_blank", "noopener");
     }
 
-    renderMetrics(payload.results || {});
-    renderOutputs(payload.outputs || []);
-    jsonOutput.textContent = JSON.stringify(payload, null, 2);
-    runTitle.textContent = "Analysis complete";
-    setStatus(`Complete. Job ID: ${payload.job_id}`);
-    progressBar.style.width = "100%";
-  } catch (error) {
-    runTitle.textContent = "Analysis failed";
-    setStatus(error.message || "Analysis failed.", true);
-  } finally {
-    setProcessing(false);
-  }
-}
-
-imageInput.addEventListener("change", () => {
-  loadPreview(imageInput.files[0]);
-});
-
-dropZone.addEventListener("dragover", (event) => {
-  event.preventDefault();
-  dropZone.classList.add("dragging");
-});
-
-dropZone.addEventListener("dragleave", () => {
-  dropZone.classList.remove("dragging");
-});
-
-dropZone.addEventListener("drop", (event) => {
-  event.preventDefault();
-  dropZone.classList.remove("dragging");
-  const [file] = event.dataTransfer.files;
-  if (!file) {
-    return;
+    if (report) {
+      btnReport.classList.remove("disabled");
+      btnReport.classList.add("download-ready");
+      btnReport.onclick = () => window.open(absoluteUrl(report), "_blank", "noopener");
+    }
   }
 
-  const transfer = new DataTransfer();
-  transfer.items.add(file);
-  imageInput.files = transfer.files;
-  loadPreview(file);
-});
+  function renderResults(payload) {
+    latestOutputs = payload.outputs || [];
+    setImage("view-original", outputUrl("original.png"), "Original");
+    setImage("view-overlay", outputUrl("overlay_predict.png"), "Overlay");
+    setImage("view-mask", outputUrl("prediction_result_predict.png"), "Mask");
+    setImage("view-cells", outputUrl("cell_count.png"), "Cell count");
+    setPlot("plot-kde", outputUrl("1_cell_area_distribution_kde.png"), "Area distribution");
+    setPlot("plot-box", outputUrl("2_cell_area_boxplot.png"), "Statistical summary");
+    setPlot("plot-pie", outputUrl("4_cell_size_categories.png"), "Size categories");
+    updateDistribution(payload.results);
+    wireDownloads();
+    selectTab("view-overlay");
+  }
 
-runButton.addEventListener("click", runAnalysis);
+  btnRunAnalysis.addEventListener("click", async () => {
+    if (!selectedFile || btnRunAnalysis.classList.contains("disabled")) return;
+
+    btnRunAnalysis.classList.add("disabled");
+    loadingOverlay.classList.remove("hidden");
+    valStatus.innerText = "Processing";
+    mainHeadline.innerText = `Processing ${selectedFile.name}`;
+    mainSubline.innerText = "Running segmentation and morphology analysis.";
+    setProgress(18, "Uploading sample...");
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    const progressTimer = setInterval(() => {
+      const current = parseInt(analysisProgress.style.width || "18", 10);
+      const next = Math.min(current + 7, 92);
+      setProgress(next, next < 45 ? "Preparing inference..." : next < 75 ? "Analyzing morphology..." : "Generating outputs...");
+    }, 900);
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        body: formData,
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.detail || `Analysis failed with HTTP ${response.status}`);
+      }
+
+      clearInterval(progressTimer);
+      setProgress(100, "Done");
+      renderResults(payload);
+      loadingOverlay.classList.add("hidden");
+      valStatus.innerText = "Complete";
+      valProcessed.innerText = parseInt(valProcessed.innerText, 10) + 1;
+      mainHeadline.innerText = "Analysis complete";
+      mainSubline.innerText = "Morphology segmentation and feature extraction finished successfully.";
+    } catch (error) {
+      clearInterval(progressTimer);
+      loadingOverlay.classList.add("hidden");
+      btnRunAnalysis.classList.remove("disabled");
+      valStatus.innerText = "Error";
+      mainHeadline.innerText = "Analysis failed";
+      mainSubline.innerText = error.message || "The backend returned an error.";
+      analysisProgressText.innerText = "Failed";
+    }
+  });
+});
 
 </script>
-  </body>
+</body>
 </html>
-
 

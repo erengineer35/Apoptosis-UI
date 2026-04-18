@@ -37,7 +37,11 @@ function setStatus(message, isError = false) {
 
 function authHeaders() {
   const key = apiKeyInput.value.trim();
-  return key ? { "X-API-Key": key } : {};
+  const headers = { "ngrok-skip-browser-warning": "1" };
+  if (key) {
+    headers["X-API-Key"] = key;
+  }
+  return headers;
 }
 
 function absoluteUrl(path) {

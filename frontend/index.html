@@ -1,10 +1,686 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Cell Morphology Studio</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <style>
+:root {
+  color-scheme: light;
+  --bg: #f4f6f2;
+  --surface: #ffffff;
+  --surface-soft: #eef3f0;
+  --ink: #18211e;
+  --muted: #637069;
+  --line: #d6ded8;
+  --accent: #087f68;
+  --accent-strong: #075f4f;
+  --cyan: #1589a6;
+  --red: #c53a31;
+  --amber: #c48717;
+  --dark: #101716;
+  --shadow: 0 18px 45px rgba(24, 33, 30, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+}
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(90deg, rgba(8, 127, 104, 0.05) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(21, 137, 166, 0.04) 1px, transparent 1px),
+    var(--bg);
+  background-size: 36px 36px;
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app-shell {
+  width: min(1480px, 100%);
+  margin: 0 auto;
+  padding: 26px;
+}
+
+.topbar {
+  display: flex;
+  min-height: 92px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.eyebrow,
+.section-kicker {
+  margin: 0 0 7px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 48px;
+  line-height: 1;
+}
+
+h2 {
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.system-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px 13px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 8px 26px rgba(24, 33, 30, 0.08);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pulse-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 rgba(8, 127, 104, 0.55);
+  animation: pulse 1.8s infinite;
+}
+
+.analysis-board {
+  display: grid;
+  grid-template-columns: minmax(340px, 430px) 1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.intake-panel,
+.run-panel,
+.result-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.intake-panel,
+.run-panel {
+  min-height: 560px;
+  padding: 22px;
+}
+
+.panel-heading {
+  display: grid;
+  gap: 9px;
+}
+
+.panel-heading p,
+.status {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.upload-zone {
+  position: relative;
+  display: grid;
+  min-height: 156px;
+  align-content: center;
+  gap: 9px;
+  margin-top: 22px;
+  border: 1px dashed #69a995;
+  border-radius: 8px;
+  padding: 20px;
+  background: var(--surface-soft);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.upload-zone::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--cyan), var(--amber), var(--red));
+  transform: translateX(-100%);
+  transition: transform 300ms ease;
+}
+
+.upload-zone:hover,
+.upload-zone.dragging {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  background: #e7f5ef;
+}
+
+.upload-zone:hover::after,
+.upload-zone.dragging::after {
+  transform: translateX(0);
+}
+
+.upload-zone input {
+  display: none;
+}
+
+.upload-mark {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--dark);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.upload-title {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.upload-detail {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.preview-frame {
+  position: relative;
+  display: grid;
+  min-height: 220px;
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 22% 26%, rgba(8, 127, 104, 0.2) 0 6px, transparent 7px),
+    radial-gradient(circle at 58% 35%, rgba(197, 58, 49, 0.2) 0 5px, transparent 6px),
+    radial-gradient(circle at 74% 68%, rgba(21, 137, 166, 0.22) 0 7px, transparent 8px),
+    #111816;
+  overflow: hidden;
+}
+
+.preview-frame img {
+  display: none;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  object-fit: contain;
+  background: #111816;
+}
+
+.preview-frame.has-image img {
+  display: block;
+}
+
+.preview-frame.has-image .preview-empty {
+  display: none;
+}
+
+.preview-empty {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  padding: 18px;
+  color: #cbd8d3;
+  text-align: center;
+}
+
+.preview-empty span {
+  width: 82px;
+  height: 82px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 35% 34%, rgba(82, 207, 165, 0.9) 0 5px, transparent 6px),
+    radial-gradient(circle at 62% 56%, rgba(246, 188, 73, 0.9) 0 6px, transparent 7px),
+    radial-gradient(circle at 48% 70%, rgba(239, 92, 81, 0.8) 0 4px, transparent 5px),
+    rgba(255, 255, 255, 0.08);
+}
+
+.primary-action {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 17px;
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 800;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.primary-action i {
+  width: 26px;
+  height: 2px;
+  background: #ffffff;
+  transform-origin: right center;
+  transition: transform 180ms ease;
+}
+
+.primary-action:hover {
+  transform: translateY(-1px);
+  background: var(--accent-strong);
+}
+
+.primary-action:hover i {
+  transform: scaleX(1.35);
+}
+
+.primary-action:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.connection-settings {
+  margin-top: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.connection-settings summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.field input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--ink);
+}
+
+.run-panel {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 22px;
+  background:
+    linear-gradient(135deg, rgba(16, 23, 22, 0.96), rgba(22, 35, 32, 0.96)),
+    #101716;
+  color: #ffffff;
+}
+
+.run-panel .section-kicker {
+  color: #79d9bd;
+}
+
+.run-panel .panel-heading p,
+.run-panel .status {
+  color: #b8c7c1;
+}
+
+.progress-shell {
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 18%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #55d6a9, #4db6d2, #f3b744);
+  transition: width 400ms ease;
+}
+
+body.is-processing .progress-bar {
+  width: 100%;
+  animation: progressFlow 1.4s ease-in-out infinite;
+}
+
+.pipeline-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.pipeline-step {
+  min-height: 150px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.pipeline-step.active,
+body.is-processing .pipeline-step {
+  border-color: rgba(85, 214, 169, 0.55);
+  background: rgba(85, 214, 169, 0.12);
+}
+
+body.is-processing .pipeline-step {
+  animation: stepFloat 1.8s ease-in-out infinite;
+}
+
+body.is-processing .pipeline-step:nth-child(2) {
+  animation-delay: 130ms;
+}
+
+body.is-processing .pipeline-step:nth-child(3) {
+  animation-delay: 260ms;
+}
+
+body.is-processing .pipeline-step:nth-child(4) {
+  animation-delay: 390ms;
+}
+
+.pipeline-step span {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--dark);
+  font-weight: 900;
+}
+
+.pipeline-step strong {
+  display: block;
+  margin-top: 14px;
+  font-size: 18px;
+}
+
+.pipeline-step p {
+  margin-top: 7px;
+  color: #b8c7c1;
+  line-height: 1.45;
+}
+
+.class-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.class-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: #dbe8e3;
+}
+
+.class-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.healthy {
+  background: #22b573;
+}
+
+.affected {
+  background: #dd4a42;
+}
+
+.irrelevant {
+  background: #e0a12a;
+}
+
+.results-area {
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.result-panel {
+  padding: 20px;
+}
+
+.section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.metric {
+  min-height: 98px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 13px;
+  background: #fbfcfa;
+  transform: translateY(0);
+  animation: riseIn 260ms ease both;
+}
+
+.metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 25px;
+  overflow-wrap: anywhere;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.image-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #101716;
+  animation: riseIn 260ms ease both;
+}
+
+.image-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: #101716;
+  transition: transform 220ms ease;
+}
+
+.image-card:hover img {
+  transform: scale(1.018);
+}
+
+.image-card p {
+  margin: 0;
+  padding: 11px 12px;
+  background: #ffffff;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.downloads a {
+  border-radius: 8px;
+  padding: 11px 13px;
+  background: #e5f2ed;
+  color: var(--accent-strong);
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.downloads a:hover {
+  transform: translateY(-1px);
+  background: #d7ebe3;
+}
+
+.raw-json summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+pre {
+  max-height: 420px;
+  overflow: auto;
+  border-radius: 8px;
+  padding: 14px;
+  background: #111816;
+  color: #e7f4ef;
+  white-space: pre-wrap;
+}
+
+.empty-state {
+  width: 100%;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  color: var(--muted);
+  background: #fbfcfa;
+}
+
+@keyframes pulse {
+  70% {
+    box-shadow: 0 0 0 10px rgba(8, 127, 104, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(8, 127, 104, 0);
+  }
+}
+
+@keyframes progressFlow {
+  0%,
+  100% {
+    transform: translateX(-70%);
+  }
+
+  50% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes stepFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1160px) {
+  .analysis-board,
+  .pipeline-list {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .metrics-grid,
+  .gallery {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    padding: 16px;
+  }
+
+  .topbar,
+  .analysis-board,
+  .pipeline-list,
+  .metrics-grid,
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    display: grid;
+  }
+
+  h1 {
+    font-size: 36px;
+  }
+
+  .intake-panel,
+  .run-panel {
+    min-height: auto;
+    padding: 16px;
+  }
+}
+
+</style>
   </head>
   <body>
     <main class="app-shell">
@@ -154,6 +830,246 @@
       </section>
     </main>
 
-    <script src="./app.js"></script>
+    <script>
+const apiBaseInput = document.getElementById("apiBaseInput");
+const apiKeyInput = document.getElementById("apiKeyInput");
+const imageInput = document.getElementById("imageInput");
+const fileName = document.getElementById("fileName");
+const runButton = document.getElementById("runButton");
+const statusText = document.getElementById("statusText");
+const systemState = document.getElementById("systemState");
+const runTitle = document.getElementById("runTitle");
+const progressBar = document.getElementById("progressBar");
+const metricsGrid = document.getElementById("metricsGrid");
+const gallery = document.getElementById("gallery");
+const downloads = document.getElementById("downloads");
+const jsonOutput = document.getElementById("jsonOutput");
+const dropZone = document.getElementById("dropZone");
+const previewFrame = document.getElementById("previewFrame");
+const previewImage = document.getElementById("previewImage");
+
+const savedApiBase = localStorage.getItem("apoptosis_api_base") || "";
+const savedApiKey = localStorage.getItem("apoptosis_api_key") || "";
+
+apiBaseInput.value = savedApiBase;
+apiKeyInput.value = savedApiKey;
+
+const imageOutputNames = new Set([
+  "original.png",
+  "prediction_result_predict.png",
+  "overlay_predict.png",
+  "cell_count.png",
+  "cell_area.png",
+  "1_cell_area_distribution_kde.png",
+  "2_cell_area_boxplot.png",
+  "3_cell_area_cumulative.png",
+  "4_cell_size_categories.png",
+]);
+
+function apiBase() {
+  return (apiBaseInput.value.trim() || window.location.origin).replace(/\/$/, "");
+}
+
+function setStatus(message, isError = false) {
+  statusText.textContent = message;
+  statusText.classList.toggle("error", isError);
+  systemState.textContent = isError ? "Attention needed" : message;
+}
+
+function setProcessing(isProcessing) {
+  document.body.classList.toggle("is-processing", isProcessing);
+  runButton.disabled = isProcessing;
+  progressBar.style.width = isProcessing ? "100%" : "18%";
+}
+
+function authHeaders() {
+  const key = apiKeyInput.value.trim();
+  const headers = { "ngrok-skip-browser-warning": "1" };
+  if (key) {
+    headers["X-API-Key"] = key;
+  }
+  return headers;
+}
+
+function absoluteUrl(path) {
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+  return `${apiBase()}${path}`;
+}
+
+function clearResultAreas() {
+  metricsGrid.innerHTML = '<div class="empty-state">Metrics will appear after analysis.</div>';
+  gallery.innerHTML = '<div class="empty-state">Generated overlays, masks, and plots will appear here.</div>';
+  downloads.innerHTML = '<div class="empty-state">JSON, PDF, and text outputs will appear here.</div>';
+  jsonOutput.textContent = "{}";
+}
+
+function metric(label, value) {
+  const card = document.createElement("div");
+  card.className = "metric";
+  card.innerHTML = `<span></span><strong></strong>`;
+  card.querySelector("span").textContent = label;
+  card.querySelector("strong").textContent = value ?? "-";
+  return card;
+}
+
+function renderMetrics(results) {
+  const stats = results.statistics || {};
+  const classDistribution = stats.class_distribution || {};
+  const areaStats = stats.area_stats || {};
+  const byClass = stats.cell_counts_by_class || {};
+
+  metricsGrid.innerHTML = "";
+  metricsGrid.append(
+    metric("Cell count", stats.cell_count),
+    metric("Total cells", stats.total_cells),
+    metric("Mean cell area", `${stats.mean_cell_area ?? 0} px`),
+    metric("Healthy", byClass.healthy ?? 0),
+    metric("Affected", byClass.affected ?? 0),
+    metric("Irrelevant", byClass.irrelevant ?? 0),
+    metric("Healthy pixels", `${classDistribution.healthy?.percent ?? 0}%`),
+    metric("Affected pixels", `${classDistribution.affected?.percent ?? 0}%`),
+    metric("Median area", areaStats.median ?? 0),
+    metric("Std area", areaStats.std ?? 0),
+    metric("Min area", areaStats.min ?? 0),
+    metric("Max area", areaStats.max ?? 0),
+  );
+}
+
+function labelFromName(name) {
+  return name
+    .replace(/^\d+_/, "")
+    .replace(/_/g, " ")
+    .replace(/\.[^.]+$/, "")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function renderOutputs(outputs) {
+  gallery.innerHTML = "";
+  downloads.innerHTML = "";
+
+  for (const output of outputs) {
+    const url = absoluteUrl(output.url);
+    if (imageOutputNames.has(output.name)) {
+      const card = document.createElement("article");
+      card.className = "image-card";
+      const image = document.createElement("img");
+      image.src = url;
+      image.alt = labelFromName(output.name);
+      const caption = document.createElement("p");
+      caption.textContent = labelFromName(output.name);
+      card.append(image, caption);
+      gallery.append(card);
+    }
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = output.name;
+    downloads.append(link);
+  }
+
+  if (!gallery.children.length) {
+    gallery.innerHTML = '<div class="empty-state">No visual outputs were returned.</div>';
+  }
+
+  if (!downloads.children.length) {
+    downloads.innerHTML = '<div class="empty-state">No downloadable files were returned.</div>';
+  }
+}
+
+function loadPreview(file) {
+  fileName.textContent = file?.name || "PNG, JPG, TIFF, or BMP";
+  if (!file) {
+    previewFrame.classList.remove("has-image");
+    previewImage.removeAttribute("src");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.addEventListener("load", () => {
+    previewImage.src = reader.result;
+    previewFrame.classList.add("has-image");
+  });
+  reader.readAsDataURL(file);
+}
+
+async function runAnalysis() {
+  const file = imageInput.files[0];
+  if (!file) {
+    setStatus("Select a microscopy image first.", true);
+    return;
+  }
+
+  runTitle.textContent = "Analysis in progress";
+  setProcessing(true);
+  setStatus("Uploading image and running the analysis pipeline.");
+  clearResultAreas();
+
+  const formData = new FormData();
+  formData.append("file", file);
+  localStorage.setItem("apoptosis_api_base", apiBaseInput.value.trim());
+  localStorage.setItem("apoptosis_api_key", apiKeyInput.value.trim());
+
+  try {
+    const response = await fetch(`${apiBase()}/api/analyze`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: formData,
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.detail || `Analysis failed with HTTP ${response.status}`);
+    }
+
+    renderMetrics(payload.results || {});
+    renderOutputs(payload.outputs || []);
+    jsonOutput.textContent = JSON.stringify(payload, null, 2);
+    runTitle.textContent = "Analysis complete";
+    setStatus(`Complete. Job ID: ${payload.job_id}`);
+    progressBar.style.width = "100%";
+  } catch (error) {
+    runTitle.textContent = "Analysis failed";
+    setStatus(error.message || "Analysis failed.", true);
+  } finally {
+    setProcessing(false);
+  }
+}
+
+imageInput.addEventListener("change", () => {
+  loadPreview(imageInput.files[0]);
+});
+
+dropZone.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  dropZone.classList.add("dragging");
+});
+
+dropZone.addEventListener("dragleave", () => {
+  dropZone.classList.remove("dragging");
+});
+
+dropZone.addEventListener("drop", (event) => {
+  event.preventDefault();
+  dropZone.classList.remove("dragging");
+  const [file] = event.dataTransfer.files;
+  if (!file) {
+    return;
+  }
+
+  const transfer = new DataTransfer();
+  transfer.items.add(file);
+  imageInput.files = transfer.files;
+  loadPreview(file);
+});
+
+runButton.addEventListener("click", runAnalysis);
+
+</script>
   </body>
 </html>
+
+
